@@ -6,7 +6,7 @@ Prinsipnya: **satu folder per jenis file, maksimal dua tingkat kedalaman.**
 Untuk mencari sesuatu cukup tanya "ini file apa?", bukan "ini fitur apa?" —
 halaman selalu di `pages/`, pemanggilan API selalu di `api/`, dan seterusnya.
 
-Total 29 file. Tidak ada folder `features/` bertingkat, tidak ada import `../../../`.
+Total 30 file. Tidak ada folder `features/` bertingkat, tidak ada import `../../../`.
 
 ---
 
@@ -24,8 +24,8 @@ kulinear/
 ├── public/                     Aset statis (favicon.svg, icons.svg)
 │
 └── src/
-    ├── main.jsx                Render <RouterProvider> ke #root
-    ├── router.jsx              Seluruh definisi route aplikasi
+    ├── main.jsx                Render <App /> ke #root
+    ├── App.jsx                 BrowserRouter + seluruh definisi route
     ├── constants.js            ROUTES (semua path) + ROLES (admin/user)
     ├── index.css               Tailwind, font, dan theme token warna
     │
@@ -37,7 +37,8 @@ kulinear/
     │
     ├── lib/                    Helper murni, tanpa React
     │   ├── authStorage.js      Baca/tulis token & user di localStorage
-    │   └── format.js           formatPrice
+    │   ├── format.js           formatPrice
+    │   └── recommendation.js   pickDailyRecommendations (rotasi harian)
     │
     ├── hooks/                  Jembatan antara api/ dan komponen
     │   └── useFoods.js         useFoods, useFoodDetail
@@ -52,13 +53,13 @@ kulinear/
     │
     ├── components/             Komponen UI yang dipakai ulang
     │   ├── FoodCard.jsx        Kartu satu makanan
-    │   └── FoodList.jsx        Grid FoodCard + empty state
+    │   ├── FoodList.jsx        Grid FoodCard + empty state
+    │   └── Pagination.jsx      Tombol halaman (maks 5 nomor + prev/next)
     │
     ├── pages/                  Satu file = satu halaman
     │   ├── LandingPage.jsx     "/"                     publik
     │   ├── AuthPage.jsx        "/login" & "/register"  dibedakan prop mode
-    │   ├── HomePage.jsx        "/home"                 butuh login
-    │   ├── FoodPage.jsx        "/foods"                daftar makanan dari API
+    │   ├── FoodPage.jsx        "/foods"  pencarian + filter + pagination
     │   ├── FoodDetailPage.jsx  "/foods/:foodId"
     │   ├── CartPage.jsx        "/cart" & "/checkout"
     │   ├── UnauthorizedPage.jsx "/unauthorized"
@@ -119,8 +120,9 @@ sama (contoh `import FoodCard from "./FoodCard"` di dalam `components/`).
 
 ## Peta Route
 
-Didefinisikan di `src/router.jsx`. Path-nya diambil dari `ROUTES` di
-`src/constants.js` — jangan tulis string path langsung di komponen.
+Didefinisikan di `src/App.jsx` memakai gaya deklaratif `<BrowserRouter>` +
+`<Routes>` + `<Route>`. Path-nya diambil dari `ROUTES` di `src/constants.js` —
+jangan tulis string path langsung di komponen.
 
 ```
 AuthLayout
@@ -130,7 +132,6 @@ AuthLayout
 MainLayout
 ├── /                               LandingPage                 publik
 ├── ProtectedRoute                                              butuh token
-│   ├── /home                       HomePage
 │   ├── /foods                      FoodPage
 │   ├── /foods/:foodId              FoodDetailPage
 │   ├── /favorites                  PlaceholderPage
@@ -155,6 +156,36 @@ MainLayout
 `location.state.from`, jadi setelah login user kembali ke tempat semula.
 `AdminRoute` mengecek `user.role === ROLES.ADMIN`.
 
+Halaman Home sudah tidak ada. Setelah login user langsung diarahkan ke `/foods`,
+yang kini memuat isi Home lama (sapaan lokasi, kotak pencarian, chip filter)
+digabung dengan daftar menu dari API.
+
+---
+
+## Cara Kerja Halaman Jelajahi Makanan
+
+Semua state-nya ada di `src/pages/FoodPage.jsx`, hanya tiga buah:
+`query` (kata kunci), `filter` (`"all"` atau `"daily"`), dan `page`.
+Daftar yang tampil dihitung ulang dari ketiganya, tidak disimpan terpisah.
+
+```
+foods (162 dari API)
+   │
+   ├── filter "daily"  ──►  pickDailyRecommendations(foods, 8)
+   │                        rotasi berdasarkan tanggal: tetap sama sepanjang
+   │                        hari, berganti sendiri setiap tanggal baru
+   │
+   ├── pencarian       ──►  cocokkan kata kunci ke name + description +
+   │                        ingredients (semua huruf kecil)
+   │
+   └── pagination      ──►  12 menu per halaman
+                            currentPage = min(page, totalPages)
+```
+
+`currentPage` sengaja dihitung dengan `Math.min`, bukan disimpan mentah. Jadi
+kalau user sedang di halaman 10 lalu mengetik kata kunci yang hanya menyisakan
+2 halaman, tampilan ikut mundur sendiri dan tidak pernah menampilkan grid kosong.
+
 ---
 
 ## Cara Menambah Fitur Baru
@@ -170,14 +201,18 @@ Contoh: menyambungkan halaman daftar transaksi ke API.
 
    export async function getMyTransactions() {
      const response = await apiClient.get(ENDPOINTS.TRANSACTIONS.MY_TRANSACTIONS);
-     return response.data;
+     return response.data.data;
    }
    ```
+
+   > Perhatikan `response.data.data`. API membungkus semua jawabannya dalam
+   > `{ code, status, message, data }`, jadi lapisan `api/` yang membukanya
+   > supaya hook dan komponen langsung menerima isinya.
 
 3. **Hook** — buat `src/hooks/useTransactions.js` yang memanggil fungsi di atas
    dan mengembalikan `{ data, loading, error }`. Ikuti pola `useFoods`.
 4. **Halaman** — buat `src/pages/TransactionPage.jsx`, lalu ganti
-   `PlaceholderPage` untuk route `/transactions` di `src/router.jsx`.
+   `PlaceholderPage` untuk route `/transactions` di `src/App.jsx`.
 5. **Komponen** — kalau ada bagian UI yang dipakai lebih dari satu halaman,
    pindahkan ke `src/components/`.
 
@@ -192,7 +227,7 @@ Ringkasan perubahan dari struktur lama (39 file, folder `features/` bertingkat):
 
 | Lama | Baru |
 |---|---|
-| `src/app/router.jsx` | `src/router.jsx` |
+| `src/app/router.jsx` (`createBrowserRouter`) | `src/App.jsx` (`<BrowserRouter>`) |
 | `src/constants/routes.js` + `src/constants/roles.js` | `src/constants.js` |
 | `src/services/apiClient.js` | `src/api/client.js` |
 | `src/services/endpoints.js` | `src/api/endpoints.js` |
@@ -208,5 +243,9 @@ Ringkasan perubahan dari struktur lama (39 file, folder `features/` bertingkat):
 | `src/components/layout/*` | `src/layouts/` |
 | `src/styles/index.css` | `src/index.css` |
 
-Dihapus karena tidak pernah di-import: `src/App.jsx`, `src/App.css`,
-`src/index.css` lama, dan seluruh isi `src/assets/`.
+Dihapus karena tidak pernah di-import: `src/App.css`, `src/index.css` lama,
+dan seluruh isi `src/assets/`.
+
+> Catatan: `src/App.jsx` bawaan template sempat dihapus karena isinya hanya
+> `return null` dan tidak pernah di-import. Sekarang file itu hidup kembali
+> dengan peran nyata, yaitu memegang seluruh definisi route.

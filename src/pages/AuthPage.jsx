@@ -32,7 +32,7 @@ export default function AuthPage({ mode }) {
       } else if (token) {
         authStorage.setToken(token);
         if (response.user) authStorage.setUser(response.user);
-        navigate(location.state?.from || ROUTES.HOME, { replace: true });
+        navigate(location.state?.from || ROUTES.FOODS, { replace: true });
       } else {
         setStatus({
           loading: false,
@@ -52,16 +52,16 @@ export default function AuthPage({ mode }) {
   return (
     <section className="mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-5 py-12 md:grid-cols-2">
       <div>
-        <Link to={ROUTES.LANDING} className="text-xl font-black text-primary">
+        <Link to={ROUTES.LANDING} className="text-base font-black text-primary">
           KULINEAR<span className="text-accent">.</span>
         </Link>
-        <p className="mt-16 text-xs font-bold uppercase tracking-[0.25em] text-accent">
+        <p className="mt-16 text-base font-bold uppercase tracking-[0.25em] text-accent">
           {isLogin ? "Welcome back" : "Make yourself at home"}
         </p>
         <h1 className="mt-4 text-5xl font-black leading-none text-navy">
           {isLogin ? "Return to your table." : "Your next favorite is waiting."}
         </h1>
-        <p className="mt-6 max-w-md text-lg leading-8 text-slate-600">
+        <p className="mt-6 max-w-md text-base leading-8 text-slate-600">
           {isLogin
             ? "Pick up your food story where you left it."
             : "Create an account to save dishes, manage your basket, and keep your discoveries close."}
@@ -72,7 +72,7 @@ export default function AuthPage({ mode }) {
         className="border border-slate-200 bg-white p-7 shadow-[8px_8px_0_#2e6dfa]"
       >
         {!isLogin && (
-          <label className="mb-4 block text-sm font-bold">
+          <label className="mb-4 block text-base font-bold">
             Name
             <input
               required
@@ -83,7 +83,7 @@ export default function AuthPage({ mode }) {
             />
           </label>
         )}
-        <label className="mb-4 block text-sm font-bold">
+        <label className="mb-4 block text-base font-bold">
           Email
           <input
             required
@@ -94,7 +94,7 @@ export default function AuthPage({ mode }) {
             className="mt-2 w-full border border-slate-300 px-3 py-3 font-normal outline-none focus:border-primary"
           />
         </label>
-        <label className="mb-4 block text-sm font-bold">
+        <label className="mb-4 block text-base font-bold">
           Password
           <input
             required
@@ -106,7 +106,7 @@ export default function AuthPage({ mode }) {
           />
         </label>
         {!isLogin && (
-          <label className="mb-4 block text-sm font-bold">
+          <label className="mb-4 block text-base font-bold">
             Repeat password
             <input
               required
@@ -119,7 +119,7 @@ export default function AuthPage({ mode }) {
           </label>
         )}
         {status.error && (
-          <p className="mb-4 bg-red-50 p-3 text-sm text-red-700">
+          <p className="mb-4 bg-red-50 p-3 text-base text-red-700">
             {status.error}
           </p>
         )}
@@ -133,7 +133,7 @@ export default function AuthPage({ mode }) {
               ? "Log in"
               : "Create account"}
         </button>
-        <p className="mt-5 text-center text-sm text-slate-500">
+        <p className="mt-5 text-center text-base text-slate-500">
           {isLogin ? "New here?" : "Already have an account?"}{" "}
           <Link
             to={isLogin ? ROUTES.REGISTER : ROUTES.LOGIN}

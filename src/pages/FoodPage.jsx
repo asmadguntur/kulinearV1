@@ -1,31 +1,153 @@
+import { useMemo, useState } from "react";
+import { Link } from "react-router";
+
 import FoodList from "@/components/FoodList";
+import Pagination from "@/components/Pagination";
+import { ROUTES } from "@/constants";
 import { useFoods } from "@/hooks/useFoods";
+import { pickDailyRecommendations } from "@/lib/recommendation";
+
+const PER_PAGE = 12;
+const DAILY_COUNT = 8;
+
+const FILTERS = [
+  { value: "all", label: "Semua" },
+  { value: "daily", label: "Rekomendasi Hari Ini" },
+];
+
+function matchesKeyword(food, keyword) {
+  const haystack = [food.name, food.description, ...(food.ingredients || [])];
+  return haystack.some((text) =>
+    String(text || "").toLowerCase().includes(keyword),
+  );
+}
 
 export default function FoodPage() {
   const { foods, loading, error, refetch } = useFoods();
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [page, setPage] = useState(1);
+
+  const recommended = useMemo(
+    () => pickDailyRecommendations(foods, DAILY_COUNT),
+    [foods],
+  );
+
+  const filtered = useMemo(() => {
+    const source = filter === "daily" ? recommended : foods;
+    const keyword = query.trim().toLowerCase();
+    if (!keyword) return source;
+    return source.filter((food) => matchesKeyword(food, keyword));
+  }, [foods, recommended, filter, query]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  // Jaga-jaga kalau daftar menyusut setelah dicari: halaman aktif ikut mundur.
+  const currentPage = Math.min(page, totalPages);
+  const visibleFoods = filtered.slice(
+    (currentPage - 1) * PER_PAGE,
+    currentPage * PER_PAGE,
+  );
+
+  const changeQuery = (event) => {
+    setQuery(event.target.value);
+    setPage(1);
+  };
+
+  const changeFilter = (value) => {
+    setFilter(value);
+    setPage(1);
+  };
+
+  const changePage = (nextPage) => {
+    setPage(nextPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <section className="mx-auto max-w-7xl px-5 py-14">
-      <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+    <section className="mx-auto max-w-[1110px] px-5 py-7 md:py-10">
+      <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">
-            The menu
-          </p>
-          <h1 className="mt-3 text-5xl font-black text-navy">Explore foods</h1>
+          <p className="text-base text-slate-500">Lokasi Pengantaran</p>
+          <h1 className="text-base font-extrabold">Rumah (Andi Wijaya)</h1>
+        </div>
+        <Link to={ROUTES.CART} className="text-2xl text-primary">
+          🛒
+        </Link>
+      </div>
+
+      <label className="mt-5 flex max-w-md items-center gap-2 rounded-2xl bg-white px-4 py-3 shadow-sm">
+        <span className="text-slate-400">⌕</span>
+        <input
+          value={query}
+          onChange={changeQuery}
+          placeholder="Cari menu favoritmu..."
+          className="min-w-0 flex-1 bg-transparent text-base text-navy outline-none placeholder:text-slate-400"
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => changeQuery({ target: { value: "" } })}
+            aria-label="Hapus pencarian"
+            className="text-slate-400 hover:text-navy"
+          >
+            ✕
+          </button>
+        )}
+      </label>
+
+      <div className="mt-6 flex gap-2 overflow-x-auto">
+        {FILTERS.map(({ value, label }) => (
+          <button
+            key={value}
+            onClick={() => changeFilter(value)}
+            className={`whitespace-nowrap rounded-full px-4 py-2 text-base font-semibold ${
+              filter === value ? "bg-primary text-white" : "bg-white text-navy"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-7 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-base font-extrabold">
+            {filter === "daily" ? "Rekomendasi Hari Ini" : "Semua Menu"}
+          </h2>
+          {!loading && !error && (
+            <p className="mt-1 text-base text-slate-500">
+              {filtered.length} menu
+              {query && ` cocok dengan "${query.trim()}"`}
+              {totalPages > 1 && ` · halaman ${currentPage} dari ${totalPages}`}
+            </p>
+          )}
         </div>
         <button
           onClick={refetch}
-          className="border border-slate-300 px-4 py-2 text-sm font-bold"
+          className="rounded-lg border border-slate-300 px-4 py-2 text-base font-bold"
         >
-          Refresh list
+          Muat ulang
         </button>
       </div>
-      {loading && <p className="text-slate-500">Loading foods...</p>}
+
+      {loading && <p className="mt-6 text-slate-500">Memuat menu...</p>}
       {error && (
-        <div className="border border-red-200 bg-red-50 p-5 text-red-700">
-          Failed to load foods. Check `VITE_API_URL` and API access.
+        <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-5 text-red-700">
+          Gagal memuat menu. Periksa `VITE_API_URL` dan akses API.
         </div>
       )}
-      {!loading && !error && <FoodList foods={foods} />}
+      {!loading && !error && (
+        <>
+          <div className="mt-4">
+            <FoodList foods={visibleFoods} />
+          </div>
+          <Pagination
+            page={currentPage}
+            totalPages={totalPages}
+            onChange={changePage}
+          />
+        </>
+      )}
     </section>
   );
 }

@@ -46,3 +46,5 @@ export const demoFoods = [
 export function getDemoFood(foodId) {
   return demoFoods.find((food) => food.id === foodId) || demoFoods[0];
 }
+
+export const FALLBACK_FOOD_IMAGE = demoFoods[0].image;

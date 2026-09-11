@@ -11,7 +11,7 @@ export default function CartPage() {
   return (
     <section className="mx-auto max-w-[1110px] px-5 py-8">
       <div className="mb-7">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">
+        <p className="text-base font-bold uppercase tracking-[0.18em] text-accent">
           Checkout
         </p>
         <h1 className="mt-2 text-2xl font-extrabold">Keranjang & Checkout</h1>
@@ -20,8 +20,8 @@ export default function CartPage() {
         <div className="space-y-5">
           <div className="rounded-xl border border-slate-200 bg-white p-5">
             <h2 className="text-base font-extrabold">Alamat Pengiriman</h2>
-            <p className="mt-4 text-sm font-bold">Rumah Andi Wijaya</p>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-4 text-base font-bold">Rumah Andi Wijaya</p>
+            <p className="mt-1 text-base text-slate-500">
               Jl. Kemang Raya No. 42, Jakarta Selatan
             </p>
           </div>
@@ -40,12 +40,12 @@ export default function CartPage() {
                   className="h-16 w-16 rounded-lg object-cover"
                 />
                 <div className="flex-1">
-                  <p className="text-sm font-bold">{food.name}</p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="text-base font-bold">{food.name}</p>
+                  <p className="mt-1 text-base text-slate-500">
                     {index + 1}x × {formatPrice(food.price)}
                   </p>
                 </div>
-                <button className="text-xs text-red-400">Hapus</button>
+                <button className="text-base text-red-400">Hapus</button>
               </div>
             ))}
           </div>
@@ -54,13 +54,13 @@ export default function CartPage() {
               Metode Pembayaran
             </h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <button className="rounded-lg border-2 border-primary p-3 text-left text-xs font-bold text-navy">
+              <button className="rounded-lg border-2 border-primary p-3 text-left text-base font-bold text-navy">
                 ◉　Transfer Bank BCA
               </button>
-              <button className="rounded-lg border border-slate-200 p-3 text-left text-xs font-bold text-slate-600">
+              <button className="rounded-lg border border-slate-200 p-3 text-left text-base font-bold text-slate-600">
                 ○　GoPay / ShopeePay
               </button>
-              <button className="rounded-lg border border-slate-200 p-3 text-left text-xs font-bold text-slate-600">
+              <button className="rounded-lg border border-slate-200 p-3 text-left text-base font-bold text-slate-600">
                 ○　OVO / DANA
               </button>
             </div>
@@ -70,7 +70,7 @@ export default function CartPage() {
           <h2 className="border-b border-slate-200 pb-4 text-base font-extrabold">
             Ringkasan Pesanan
           </h2>
-          <div className="space-y-3 py-4 text-sm">
+          <div className="space-y-3 py-4 text-base">
             <div className="flex justify-between text-slate-500">
               <span>Total Harga (3 Barang)</span>
               <span>{formatPrice(subtotal)}</span>
@@ -90,7 +90,7 @@ export default function CartPage() {
           </div>
           <Link
             to={ROUTES.TRANSACTIONS}
-            className="mt-5 block rounded-lg bg-accent py-3 text-center text-sm font-bold text-white"
+            className="mt-5 block rounded-lg bg-accent py-3 text-center text-base font-bold text-white"
           >
             Buat Transaksi
           </Link>

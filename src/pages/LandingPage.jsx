@@ -15,30 +15,30 @@ export default function LandingPage() {
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy/95 via-navy/60 to-navy/20" />
         <div className="mx-auto max-w-[1110px] px-5 py-20 md:py-24">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-100">
+          <p className="text-base font-bold uppercase tracking-[0.2em] text-blue-100">
             Rasa Nusantara, di depan pintu
           </p>
           <h1 className="mt-4 max-w-lg text-4xl font-extrabold leading-tight md:text-6xl">
             Nikmati Cita Rasa Kuliner Nusantara Terbaik
           </h1>
-          <p className="mt-5 max-w-xl text-sm leading-6 text-slate-200 md:text-base">
+          <p className="mt-5 max-w-xl text-base leading-6 text-slate-200">
             Pesan makanan tradisional dan modern favoritmu langsung diantar ke
             depan pintu rumah dengan aman dan hangat.
           </p>
           <div className="mt-7 flex max-w-md overflow-hidden rounded-full bg-white p-1">
             <span className="px-4 py-3 text-slate-400">⌕</span>
             <input
-              className="min-w-0 flex-1 bg-transparent text-sm text-navy outline-none"
+              className="min-w-0 flex-1 bg-transparent text-base text-navy outline-none"
               placeholder="Cari sate, nasi goreng, gado-gado..."
             />
-            <button className="rounded-full bg-accent px-7 py-2 text-sm font-bold text-white">
+            <button className="rounded-full bg-accent px-7 py-2 text-base font-bold text-white">
               Cari
             </button>
           </div>
         </div>
       </section>
       <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-[1110px] gap-2 overflow-x-auto px-5 py-5 text-xs font-semibold">
+        <div className="mx-auto flex max-w-[1110px] gap-2 overflow-x-auto px-5 py-5 text-base font-semibold">
           <button className="rounded-full bg-primary px-4 py-2 text-white">
             Semua
           </button>
@@ -64,14 +64,14 @@ export default function LandingPage() {
       <section className="mx-auto max-w-[1110px] px-5 py-8">
         <div className="mb-5 flex items-end justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">
+            <p className="text-base font-bold uppercase tracking-[0.18em] text-accent">
               Pilihan untukmu
             </p>
-            <h2 className="mt-2 text-xl font-extrabold md:text-2xl">
+            <h2 className="mt-2 text-base font-extrabold md:text-2xl">
               Menu Rekomendasi Terlaris
             </h2>
           </div>
-          <Link to={ROUTES.FOODS} className="text-xs font-bold text-primary">
+          <Link to={ROUTES.FOODS} className="text-base font-bold text-primary">
             Lihat semua →
           </Link>
         </div>
@@ -88,16 +88,16 @@ export default function LandingPage() {
               />
               <div className="p-3">
                 <div className="flex items-center justify-between">
-                  <span className="rounded bg-orange-50 px-2 py-1 text-[10px] font-bold text-accent">
+                  <span className="rounded bg-orange-50 px-2 py-1 text-base font-bold text-accent">
                     Populer
                   </span>
-                  <span className="text-lg text-accent">♡</span>
+                  <span className="text-base text-accent">♡</span>
                 </div>
-                <h3 className="mt-3 truncate text-sm font-bold">{food.name}</h3>
-                <p className="mt-1 text-sm font-extrabold text-primary">
+                <h3 className="mt-3 truncate text-base font-bold">{food.name}</h3>
+                <p className="mt-1 text-base font-extrabold text-primary">
                   {formatPrice(food.price)}
                 </p>
-                <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
+                <div className="mt-3 flex items-center justify-between text-base text-slate-500">
                   <span className="text-accent">
                     ★ <b className="text-navy">{food.rating}</b> ({food.reviews}{" "}
                     Ulasan)

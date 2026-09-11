@@ -21,16 +21,16 @@ export default function Navbar() {
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex max-w-[1110px] items-center gap-5 px-5 py-4">
         <Link
-          to={isSignedIn ? ROUTES.HOME : ROUTES.LANDING}
-          className="flex items-center gap-2 text-lg font-extrabold text-primary"
+          to={isSignedIn ? ROUTES.FOODS : ROUTES.LANDING}
+          className="flex items-center gap-2 text-base font-extrabold text-primary"
         >
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-sm text-white">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-base text-white">
             ♜
           </span>
           KULINEAR
         </Link>
         {isSignedIn && (
-          <nav className="mx-auto hidden items-center gap-8 text-xs font-semibold md:flex">
+          <nav className="mx-auto hidden items-center gap-8 text-base font-semibold md:flex">
             {navItems.map(([label, to]) => (
               <NavLink
                 key={to}
@@ -51,18 +51,18 @@ export default function Navbar() {
           <div className="ml-auto flex items-center gap-4">
             <Link
               to={ROUTES.CART}
-              className="text-xl text-navy"
+              className="text-base text-navy"
               aria-label="Cart"
             >
               🛒
-              <sup className="ml-0.5 rounded-full bg-accent px-1 text-[9px] text-white">
+              <sup className="ml-0.5 rounded-full bg-accent px-1 text-base text-white">
                 3
               </sup>
             </Link>
             <span className="hidden h-6 w-px bg-slate-200 sm:block" />
             <button
               onClick={logout}
-              className="hidden text-xs font-semibold text-slate-600 hover:text-primary sm:block"
+              className="hidden text-base font-semibold text-slate-600 hover:text-primary sm:block"
             >
               Log out
             </button>
@@ -71,13 +71,13 @@ export default function Navbar() {
           <div className="ml-auto flex gap-3">
             <Link
               to={ROUTES.LOGIN}
-              className="px-3 py-2 text-sm text-slate-600"
+              className="px-3 py-2 text-base text-slate-600"
             >
               Masuk
             </Link>
             <Link
               to={ROUTES.REGISTER}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-bold text-white"
+              className="rounded-md bg-primary px-4 py-2 text-base font-bold text-white"
             >
               Daftar
             </Link>

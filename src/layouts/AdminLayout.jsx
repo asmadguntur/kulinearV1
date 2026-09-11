@@ -13,7 +13,7 @@ export default function AdminLayout() {
   return (
     <div className="grid min-h-[calc(100vh-76px)] md:grid-cols-[220px_1fr]">
       <aside className="border-b border-slate-200 bg-white p-5 md:border-b-0 md:border-r">
-        <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+        <p className="mb-5 text-base font-bold uppercase tracking-[0.2em] text-primary">
           Admin console
         </p>
         <nav className="flex gap-2 overflow-x-auto md:flex-col">
@@ -23,7 +23,7 @@ export default function AdminLayout() {
               to={to}
               end={to === ROUTES.ADMIN}
               className={({ isActive }) =>
-                `whitespace-nowrap px-3 py-2 text-sm ${isActive ? "bg-primary text-white" : "text-slate-600 hover:bg-blue-50"}`
+                `whitespace-nowrap px-3 py-2 text-base ${isActive ? "bg-primary text-white" : "text-slate-600 hover:bg-blue-50"}`
               }
             >
               {label}

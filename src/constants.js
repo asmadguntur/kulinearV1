@@ -4,7 +4,6 @@ export const ROUTES = {
   LANDING: "/",
   LOGIN: "/login",
   REGISTER: "/register",
-  HOME: "/home",
   FOODS: "/foods",
   FOOD_DETAIL: (foodId) => `/foods/${foodId}`,
   FAVORITES: "/favorites",

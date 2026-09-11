@@ -8,9 +8,9 @@ export function useFoods() {
   const fetchFoods = useCallback(async () => {
     try {
       setState({ loading: true, error: null });
+      // getFoods() sudah mengembalikan array menu, bukan objek pembungkus API.
       const response = await getFoods();
-
-      setFoods(Array.isArray(response.data) ? response.data : []);
+      setFoods(Array.isArray(response) ? response : []);
     } catch (error) {
       setState({ loading: false, error });
       return;

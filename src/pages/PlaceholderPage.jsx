@@ -1,7 +1,7 @@
 export default function PlaceholderPage({ title }) {
   return (
     <section className="mx-auto max-w-7xl px-5 py-14">
-      <p className="text-xs font-bold uppercase tracking-[0.25em] text-accent">
+      <p className="text-base font-bold uppercase tracking-[0.25em] text-accent">
         KULINEAR
       </p>
       <h1 className="mt-3 text-4xl font-black text-navy">{title}</h1>

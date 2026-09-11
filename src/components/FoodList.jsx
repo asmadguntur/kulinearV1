@@ -3,8 +3,8 @@ import FoodCard from "./FoodCard";
 export default function FoodList({ foods }) {
   if (!foods.length)
     return (
-      <p className="border border-dashed border-slate-300 p-8 text-slate-500">
-        No foods were returned by the API.
+      <p className="rounded-lg border border-dashed border-slate-300 p-8 text-base text-slate-500">
+        Tidak ada menu yang cocok. Coba kata kunci lain atau ganti filter.
       </p>
     );
   return (
