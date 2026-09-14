@@ -1,6 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router";
-
-import { ROUTES } from "@/constants";
+import { ROLES, ROUTES } from "@/constants";
+// import { ROUTES } from "@/constants";
 import { authStorage } from "@/lib/authStorage";
 
 const navItems = [
@@ -11,6 +11,11 @@ const navItems = [
 export default function Navbar() {
   const navigate = useNavigate();
   const isSignedIn = Boolean(authStorage.getToken());
+  const user = authStorage.getUser();
+  const isAdmin = user?.role === ROLES.ADMIN;
+  const items = isAdmin
+    ? [[...navItems], ["Admin Console", ROUTES.ADMIN_USERS]]
+    : navItems;
 
   const logout = () => {
     authStorage.clear();
@@ -31,7 +36,7 @@ export default function Navbar() {
         </Link>
         {isSignedIn && (
           <nav className="mx-auto hidden items-center gap-8 text-base font-semibold md:flex">
-            {navItems.map(([label, to]) => (
+            {items.map(([label, to]) => (
               <NavLink
                 key={to}
                 to={to}
@@ -44,7 +49,6 @@ export default function Navbar() {
                 {label}
               </NavLink>
             ))}
-            <span className="text-slate-500">Promo</span>
           </nav>
         )}
         {isSignedIn ? (
