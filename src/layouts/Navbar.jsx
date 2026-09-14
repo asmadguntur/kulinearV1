@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router";
 import { ROLES, ROUTES } from "@/constants";
 import { authStorage } from "@/lib/authStorage";
+import { useState } from "react";
 
 const navItems = [
   ["Jelajahi Makanan", ROUTES.FOODS],
@@ -9,6 +10,7 @@ const navItems = [
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
   const isSignedIn = Boolean(authStorage.getToken());
   const user = authStorage.getUser();
   const isAdmin = user?.role === ROLES.ADMIN;
@@ -17,9 +19,13 @@ export default function Navbar() {
     : [...navItems, ["Favorit", ROUTES.FAVORITES]];
 
   const logout = () => {
+    setMenuOpen(false);
     authStorage.clear();
     navigate(ROUTES.LANDING);
   };
+
+  const linkClass = ({ isActive }) =>
+    isActive ? "text-primary" : "text-slate-500 hover:text-primary";
 
   return (
     <header className="border-b border-slate-200 bg-white">
@@ -36,15 +42,7 @@ export default function Navbar() {
         {isSignedIn && (
           <nav className="mx-auto hidden items-center gap-8 text-base font-semibold md:flex">
             {items.map(([label, to]) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-primary"
-                    : "text-slate-500 hover:text-primary"
-                }
-              >
+              <NavLink key={to} to={to} className={linkClass}>
                 {label}
               </NavLink>
             ))}
@@ -58,16 +56,26 @@ export default function Navbar() {
               aria-label="Cart"
             >
               🛒
-              <sup className="ml-0.5 rounded-full bg-accent px-1 text-base text-white">
+              <sup className="ml-0.5 rounded-full bg-accent px-1 text-xs text-white">
                 3
               </sup>
             </Link>
-            <span className="hidden h-6 w-px bg-slate-200 sm:block" />
+            <span className="hidden h-6 w-px bg-slate-200 md:block" />
             <button
               onClick={logout}
-              className="hidden text-base font-semibold text-slate-600 hover:text-primary sm:block"
+              className="hidden text-base font-semibold text-slate-600 hover:text-primary md:block"
             >
-              Log out
+              Keluar
+            </button>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
+              className="grid h-9 w-9 place-items-center rounded-lg text-xl text-navy hover:bg-slate-100 md:hidden"
+            >
+              {menuOpen ? "✕" : "☰"}
             </button>
           </div>
         ) : (
@@ -87,6 +95,32 @@ export default function Navbar() {
           </div>
         )}
       </div>
+      {isSignedIn && menuOpen && (
+        <nav
+          id="mobile-menu"
+          className="border-t border-slate-200 px-5 py-3 md:hidden"
+        >
+          {items.map(([label, to]) => (
+            <NavLink
+              key={to}
+              to={to}
+              onClick={() => setMenuOpen(false)}
+              className={(state) =>
+                `block py-3 text-base font-semibold ${linkClass(state)}`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+          <button
+            type="button"
+            onClick={logout}
+            className="mt-2 block w-full border-t border-slate-200 pt-4 pb-1 text-left text-base font-semibold text-slate-600 hover:text-primary"
+          >
+            Keluar
+          </button>
+        </nav>
+      )}
     </header>
   );
 }
