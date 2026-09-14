@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 
-import { ROUTES } from "@/constants";
+import { ROLES, ROUTES } from "@/constants";
 import { authStorage } from "@/lib/authStorage";
 import { loginUser, registerUser } from "@/api/auth";
+import { getErrorMessage } from "@/api/client";
 
 export default function AuthPage({ mode }) {
   const isLogin = mode === "login";
   const navigate = useNavigate();
   const location = useLocation();
+  // Dikirim oleh halaman register setelah akun berhasil dibuat.
+  const justRegistered = isLogin && location.state?.registered;
   const [form, setForm] = useState(
     isLogin
-      ? { email: "", password: "" }
+      ? { email: location.state?.email || "", password: "" }
       : { name: "", email: "", password: "", passwordRepeat: "" },
   );
   const [status, setStatus] = useState({ loading: false, error: "" });
@@ -21,16 +24,24 @@ export default function AuthPage({ mode }) {
 
   const submit = async (event) => {
     event.preventDefault();
+    if (!isLogin && form.password !== form.passwordRepeat) {
+      setStatus({ loading: false, error: "Passwords do not match." });
+      return;
+    }
     setStatus({ loading: true, error: "" });
     try {
-      const response = isLogin
-        ? await loginUser(form)
-        : await registerUser(form);
-      const token = response?.token;
       if (!isLogin) {
-        navigate(ROUTES.LOGIN, { replace: true });
-      } else if (token) {
-        authStorage.setToken(token);
+        // API mewajibkan field role. Akun dari form publik selalu "user".
+        await registerUser({ ...form, role: ROLES.USER });
+        navigate(ROUTES.LOGIN, {
+          replace: true,
+          state: { registered: true, email: form.email },
+        });
+        return;
+      }
+      const response = await loginUser(form);
+      if (response?.token) {
+        authStorage.setToken(response.token);
         if (response.user) authStorage.setUser(response.user);
         navigate(location.state?.from || ROUTES.FOODS, { replace: true });
       } else {
@@ -41,11 +52,7 @@ export default function AuthPage({ mode }) {
         });
       }
     } catch (error) {
-      setStatus({
-        loading: false,
-        error:
-          error.response?.data?.message || error.message || "Request failed.",
-      });
+      setStatus({ loading: false, error: getErrorMessage(error) });
     }
   };
 
@@ -71,6 +78,11 @@ export default function AuthPage({ mode }) {
         onSubmit={submit}
         className="border border-slate-200 bg-white p-7 shadow-[8px_8px_0_#2e6dfa]"
       >
+        {justRegistered && !status.error && (
+          <p className="mb-4 bg-green-50 p-3 text-base text-green-700">
+            Account created. Log in with your new account.
+          </p>
+        )}
         {!isLogin && (
           <label className="mb-4 block text-base font-bold">
             Name
@@ -100,6 +112,7 @@ export default function AuthPage({ mode }) {
             required
             type="password"
             name="password"
+            minLength={isLogin ? undefined : 6}
             value={form.password}
             onChange={update}
             className="mt-2 w-full border border-slate-300 px-3 py-3 font-normal outline-none focus:border-primary"
@@ -112,6 +125,7 @@ export default function AuthPage({ mode }) {
               required
               type="password"
               name="passwordRepeat"
+              minLength={6}
               value={form.passwordRepeat}
               onChange={update}
               className="mt-2 w-full border border-slate-300 px-3 py-3 font-normal outline-none focus:border-primary"

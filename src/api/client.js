@@ -23,4 +23,14 @@ apiClient.interceptors.response.use(
   },
 );
 
+// API mengirim error dalam dua bentuk:
+//   { message: "User not found" }                     -> error biasa
+//   { errors: [{ field, message }, ...] }             -> error validasi (mis. register)
+export function getErrorMessage(error) {
+  const data = error.response?.data;
+  if (data?.errors?.length)
+    return data.errors.map((item) => item.message).join(" ");
+  return data?.message || error.message || "Request failed.";
+}
+
 export default apiClient;

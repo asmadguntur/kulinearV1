@@ -5,6 +5,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import MainLayout from "@/layouts/MainLayout";
 import { AdminRoute, ProtectedRoute } from "@/layouts/RouteGuard";
+import AdminUsersPage from "@/pages/AdminUsersPage";
 import AuthPage from "@/pages/AuthPage";
 import CartPage from "@/pages/CartPage";
 import FoodDetailPage from "@/pages/FoodDetailPage";
@@ -18,12 +19,17 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Halaman tanpa navbar: login & register */}
+        {/* Halaman tanpa navbar: login & register.
+            key berbeda supaya React membuat AuthPage baru saat pindah halaman,
+            bukan memakai ulang state form yang lama. */}
         <Route element={<AuthLayout />}>
-          <Route path={ROUTES.LOGIN} element={<AuthPage mode="login" />} />
+          <Route
+            path={ROUTES.LOGIN}
+            element={<AuthPage key="login" mode="login" />}
+          />
           <Route
             path={ROUTES.REGISTER}
-            element={<AuthPage mode="register" />}
+            element={<AuthPage key="register" mode="register" />}
           />
         </Route>
 
@@ -73,10 +79,7 @@ export default function App() {
                   path="foods/:foodId/edit"
                   element={<PlaceholderPage title="Edit food" />}
                 />
-                <Route
-                  path="users"
-                  element={<PlaceholderPage title="Manage users" />}
-                />
+                <Route path="users" element={<AdminUsersPage />} />
                 <Route
                   path="transactions"
                   element={<PlaceholderPage title="Manage transactions" />}
