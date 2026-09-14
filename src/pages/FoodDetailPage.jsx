@@ -1,12 +1,17 @@
 import { Link, useParams } from "react-router";
-import { ROUTES } from "@/constants";
+import { ROLES, ROUTES } from "@/constants";
+import { useFavorites } from "@/hooks/useFavorites";
 import { useFoodDetail } from "@/hooks/useFoods";
 import { FALLBACK_FOOD_IMAGE, getDemoFood } from "@/data/demoFoods";
+import { authStorage } from "@/lib/authStorage";
 import { formatPrice } from "@/lib/format";
 
 export default function FoodDetailPage() {
   const { foodId } = useParams();
   const { food, loading } = useFoodDetail(foodId);
+  // Favorit hanya untuk role user; admin tidak melihat tombol favorit.
+  const isUser = authStorage.getUser()?.role === ROLES.USER;
+  const favorite = useFavorites({ enabled: isUser });
   // Data contoh dipakai sebagai cadangan kalau API belum/gagal mengirim detail.
   const fallback = getDemoFood(foodId);
   const visualFood = {
@@ -18,6 +23,11 @@ export default function FoodDetailPage() {
     totalLikes: fallback.reviews,
     ...(food || {}),
   };
+  const liked = favorite.isFavorite(foodId);
+  const favoriteDisabled = favorite.loading || favorite.isPending(foodId);
+  const toggleFavorite = () =>
+    favorite.toggleFavorite({ ...visualFood, id: foodId });
+
   if (loading)
     return (
       <section className="mx-auto max-w-7xl px-5 py-14 text-slate-500">
@@ -68,9 +78,18 @@ export default function FoodDetailPage() {
             <h1 className="text-2xl font-extrabold leading-tight">
               {visualFood.name}
             </h1>
-            <button className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-orange-50 text-base text-accent">
-              ♡
-            </button>
+            {isUser && (
+              <button
+                type="button"
+                onClick={toggleFavorite}
+                disabled={favoriteDisabled}
+                aria-pressed={liked}
+                aria-label={liked ? "Hapus dari favorit" : "Simpan ke favorit"}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-orange-50 text-base text-accent disabled:opacity-50"
+              >
+                {liked ? "♥" : "♡"}
+              </button>
+            )}
           </div>
           <p className="mt-3 text-base text-accent">
             ★ <b className="text-navy">{visualFood.rating}</b>{" "}
@@ -97,9 +116,21 @@ export default function FoodDetailPage() {
           <button className="mt-6 w-full rounded-lg bg-primary py-3 text-base font-bold text-white">
             🛒　Tambah ke Keranjang
           </button>
-          <button className="mt-3 w-full rounded-lg border border-slate-200 py-3 text-base font-bold text-navy">
-            ♡　Simpan ke Favorit
-          </button>
+          {isUser && (
+            <button
+              type="button"
+              onClick={toggleFavorite}
+              disabled={favoriteDisabled}
+              className="mt-3 w-full rounded-lg border border-slate-200 py-3 text-base font-bold text-navy disabled:opacity-50"
+            >
+              {liked ? "♥　Hapus dari Favorit" : "♡　Simpan ke Favorit"}
+            </button>
+          )}
+          {favorite.actionError && (
+            <p className="mt-3 rounded-lg bg-red-50 p-3 text-base text-red-700">
+              {favorite.actionError}
+            </p>
+          )}
         </div>
       </div>
     </section>

@@ -158,6 +158,10 @@ export default function AuthPage({ mode }) {
             {isLogin ? "Create an account" : "Log in"}
           </Link>
         </p>
+        <div className="mt-5 text-center text-sm text-slate-400">
+          <p>user: user@mail.com / 123123</p>
+          <p>admin: admin@mail.com / 123123</p>
+        </div>
       </form>
     </section>
   );

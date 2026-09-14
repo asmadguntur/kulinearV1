@@ -4,7 +4,13 @@ import { ROUTES } from "@/constants";
 import { FALLBACK_FOOD_IMAGE } from "@/data/demoFoods";
 import { formatPrice } from "@/lib/format";
 
-export default function FoodCard({ food }) {
+// Tombol favorit hanya tampil kalau onToggleFavorite dikirim, yaitu untuk role user.
+export default function FoodCard({
+  food,
+  isFavorite = false,
+  favoritePending = false,
+  onToggleFavorite,
+}) {
   const showFallbackImage = (event) => {
     event.currentTarget.src = FALLBACK_FOOD_IMAGE;
   };
@@ -22,7 +28,18 @@ export default function FoodCard({ food }) {
           <span className="rounded bg-orange-50 px-2 py-1 text-base font-bold text-accent">
             Populer
           </span>
-          <span className="text-base text-accent">♡</span>
+          {onToggleFavorite && (
+            <button
+              type="button"
+              onClick={() => onToggleFavorite(food)}
+              disabled={favoritePending}
+              aria-pressed={isFavorite}
+              aria-label={isFavorite ? "Hapus dari favorit" : "Simpan ke favorit"}
+              className="grid h-8 w-8 place-items-center rounded-full text-lg text-accent hover:bg-orange-50 disabled:opacity-50"
+            >
+              {isFavorite ? "♥" : "♡"}
+            </button>
+          )}
         </div>
         <h2 className="mt-3 text-base font-bold">
           {food.name || "Unnamed food"}

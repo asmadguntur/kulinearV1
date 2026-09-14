@@ -14,7 +14,7 @@ export default function Navbar() {
   const isAdmin = user?.role === ROLES.ADMIN;
   const items = isAdmin
     ? [...navItems, ["Admin Console", ROUTES.ADMIN]]
-    : navItems;
+    : [...navItems, ["Favorit", ROUTES.FAVORITES]];
 
   const logout = () => {
     authStorage.clear();

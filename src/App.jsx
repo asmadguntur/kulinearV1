@@ -4,10 +4,11 @@ import { ROUTES } from "@/constants";
 import AdminLayout from "@/layouts/AdminLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import MainLayout from "@/layouts/MainLayout";
-import { AdminRoute, ProtectedRoute } from "@/layouts/RouteGuard";
+import { AdminRoute, ProtectedRoute, UserRoute } from "@/layouts/RouteGuard";
 import AdminUsersPage from "@/pages/AdminUsersPage";
 import AuthPage from "@/pages/AuthPage";
 import CartPage from "@/pages/CartPage";
+import FavoritesPage from "@/pages/FavoritesPage";
 import FoodDetailPage from "@/pages/FoodDetailPage";
 import FoodPage from "@/pages/FoodPage";
 import LandingPage from "@/pages/LandingPage";
@@ -41,10 +42,10 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path={ROUTES.FOODS} element={<FoodPage />} />
             <Route path="/foods/:foodId" element={<FoodDetailPage />} />
-            <Route
-              path={ROUTES.FAVORITES}
-              element={<PlaceholderPage title="Favorites" />}
-            />
+            {/* Khusus role user */}
+            <Route element={<UserRoute />}>
+              <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
+            </Route>
             <Route path={ROUTES.CART} element={<CartPage />} />
             <Route path={ROUTES.CHECKOUT} element={<CartPage />} />
             <Route

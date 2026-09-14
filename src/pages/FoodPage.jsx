@@ -2,9 +2,11 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router";
 
 import FoodList from "@/components/FoodList";
-import Pagination from "@/components/Pagination";
-import { ROUTES } from "@/constants";
+import { ROLES, ROUTES } from "@/constants";
+import { useFavorites } from "@/hooks/useFavorites";
 import { useFoods } from "@/hooks/useFoods";
+import { authStorage } from "@/lib/authStorage";
+import Pagination from "@/components/Pagination";
 import { pickDailyRecommendations } from "@/lib/recommendation";
 
 const PER_PAGE = 12;
@@ -24,6 +26,9 @@ function matchesKeyword(food, keyword) {
 
 export default function FoodPage() {
   const { foods, loading, error, refetch } = useFoods();
+  // Favorit hanya untuk role user; admin tidak melihat tombol ♡.
+  const isUser = authStorage.getUser()?.role === ROLES.USER;
+  const favorite = useFavorites({ enabled: isUser });
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const [page, setPage] = useState(1);
@@ -130,6 +135,12 @@ export default function FoodPage() {
         </button>
       </div>
 
+      {favorite.actionError && (
+        <p className="mt-6 rounded-lg bg-red-50 p-3 text-base text-red-700">
+          {favorite.actionError}
+        </p>
+      )}
+
       {loading && <p className="mt-6 text-slate-500">Memuat menu...</p>}
       {error && (
         <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-5 text-red-700">
@@ -139,7 +150,12 @@ export default function FoodPage() {
       {!loading && !error && (
         <>
           <div className="mt-4">
-            <FoodList foods={visibleFoods} />
+            <FoodList
+              foods={visibleFoods}
+              isFavorite={favorite.isFavorite}
+              isFavoritePending={favorite.isPending}
+              onToggleFavorite={isUser ? favorite.toggleFavorite : undefined}
+            />
           </div>
           <Pagination
             page={currentPage}
