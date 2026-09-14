@@ -43,7 +43,9 @@ export default function AuthPage({ mode }) {
       if (response?.token) {
         authStorage.setToken(response.token);
         if (response.user) authStorage.setUser(response.user);
-        navigate(location.state?.from || ROUTES.FOODS, { replace: true });
+        const isAdmin = response.user?.role === ROLES.ADMIN;
+        const homePage = isAdmin ? ROUTES.ADMIN : ROUTES.FOODS;
+        navigate(location.state?.from || homePage, { replace: true });
       } else {
         setStatus({
           loading: false,

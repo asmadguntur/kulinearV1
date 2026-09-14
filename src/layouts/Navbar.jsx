@@ -1,6 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router";
 import { ROLES, ROUTES } from "@/constants";
-// import { ROUTES } from "@/constants";
 import { authStorage } from "@/lib/authStorage";
 
 const navItems = [
@@ -14,7 +13,7 @@ export default function Navbar() {
   const user = authStorage.getUser();
   const isAdmin = user?.role === ROLES.ADMIN;
   const items = isAdmin
-    ? [[...navItems], ["Admin Console", ROUTES.ADMIN_USERS]]
+    ? [...navItems, ["Admin Console", ROUTES.ADMIN]]
     : navItems;
 
   const logout = () => {
