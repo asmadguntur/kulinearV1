@@ -10,9 +10,6 @@ import { formatPrice } from "@/lib/format";
 
 const PER_PAGE = 10;
 
-const inputClass =
-  "mt-2 w-full border border-slate-300 bg-white px-3 py-2 font-normal outline-none focus:border-primary";
-
 function matchesKeyword(food, keyword) {
   const haystack = [food.name, food.description, ...(food.ingredients || [])];
   return haystack.some((text) =>
@@ -22,119 +19,17 @@ function matchesKeyword(food, keyword) {
   );
 }
 
-function CreateFoodForm({ onCreated, onCancel }) {
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [status, setStatus] = useState({ loading: false, error: "" });
-
-  const update = (event) =>
-    setForm({ ...form, [event.target.name]: event.target.value });
-
-  const submit = async (event) => {
-    event.preventDefault();
-    if (form.password !== form.passwordRepeat) {
-      setStatus({
-        loading: false,
-        error: "Password dan ulangi password tidak sama.",
-      });
-      return;
-    }
-    setStatus({ loading: true, error: "" });
-    try {
-      const { phoneNumber, ...payload } = form;
-      await registerUser(phoneNumber ? { ...payload, phoneNumber } : payload);
-      onCreated(form.email);
-    } catch (error) {
-      setStatus({ loading: false, error: getErrorMessage(error) });
-    }
-  };
-
-  return (
-    <form
-      onSubmit={submit}
-      className="mt-6 border border-slate-200 bg-white p-6 shadow-[6px_6px_0_#2e6dfa]"
-    >
-      <h2 className="text-lg font-extrabold">Tambah makanan</h2>
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <label className="block text-base font-bold">
-          Nama
-          <input
-            required
-            name="name"
-            value={form.name}
-            onChange={update}
-            className={inputClass}
-          />
-        </label>
-        <label className="block text-base font-bold">
-          Harga
-          <input
-            required
-            type="number"
-            name="price"
-            value={form.price}
-            onChange={update}
-            className={inputClass}
-          />
-        </label>
-        <label className="block text-base font-bold">
-          Gambar
-          <input
-            type="text"
-            name="image"
-            value={form.image}
-            onChange={update}
-            className={inputClass}
-          />
-        </label>
-        <label className="block text-base font-bold">
-          Deskripsi
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={update}
-            className={inputClass}
-          />
-        </label>
-      </div>
-      {status.error && (
-        <p className="mt-4 bg-red-50 p-3 text-base text-red-700">
-          {status.error}
-        </p>
-      )}
-      <div className="mt-5 flex flex-wrap gap-3">
-        <button
-          disabled={status.loading}
-          className="bg-primary px-5 py-2 font-bold text-white disabled:opacity-60"
-        >
-          {status.loading ? "Menyimpan..." : "Simpan makanan"}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="border border-slate-300 px-5 py-2 font-bold"
-        >
-          Batal
-        </button>
-      </div>
-    </form>
-  );
-}
-
 export default function AdminFoodsPage() {
-  const { foods, loading, error, refetch } = useFoods();
+  const { foods, setFoods, loading, error, refetch } = useFoods();
   const location = useLocation();
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [showForm, setShowForm] = useState(false);
+
   const [deletingId, setDeletingId] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(null);
+
   const [notice, setNotice] = useState(
     location.state?.notice || { type: "", text: "" },
   );
-
-  //   useEffect(() => {
-  //     setCurrentUserId(authStorage.getUser()?.id ?? null);
-  //   }, []);
 
   const filtered = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -149,22 +44,22 @@ export default function AdminFoodsPage() {
     currentPage * PER_PAGE,
   );
 
-  const handleCreated = async (email) => {
-    setShowForm(false);
-    setNotice({
-      type: "success",
-      text: `Makanan ${email} berhasil ditambahkan.`,
-    });
-    refetch();
-  };
-
   const removeFood = async (food) => {
-    if (!food) return;
+    if (
+      !window.confirm(`Apakah Anda yakin ingin menghapus makanan ${food.name}?`)
+    ) {
+      return;
+    }
 
     setDeletingId(food.id);
+    setNotice({ type: "", text: "" });
     try {
       await deleteFood(food.id);
-      refetch();
+      setFoods((list) => list.filter((f) => f.id !== food.id));
+      setNotice({
+        type: "success",
+        text: `Makanan ${food.name} berhasil dihapus.`,
+      });
     } catch (error) {
       setNotice({
         type: "error",
@@ -198,14 +93,13 @@ export default function AdminFoodsPage() {
           >
             Muat ulang
           </button>
-          {!showForm && (
-            <Link
-              to={ROUTES.ADMIN_CREATE_FOOD}
-              className="bg-primary px-4 py-2 font-bold text-white"
-            >
-              + Tambah makanan
-            </Link>
-          )}
+
+          <Link
+            to={ROUTES.ADMIN_CREATE_FOOD}
+            className="bg-primary px-4 py-2 font-bold text-white"
+          >
+            + Tambah makanan
+          </Link>
         </div>
       </div>
 
@@ -266,7 +160,50 @@ export default function AdminFoodsPage() {
                 )}
                 {visibleFoods.map((food) => (
                   <tr key={food.id} className="border-t border-slate-100">
-                    {/* baris makanan, lihat F4 */}
+                    <td className="px-4 py-3">
+                      <img
+                        src={food.imageUrl || FALLBACK_FOOD_IMAGE}
+                        alt=""
+                        onError={(event) => {
+                          event.currentTarget.src = FALLBACK_FOOD_IMAGE;
+                        }}
+                        className="h-12 w-16 rounded object-cover"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="font-semibold">{food.name || "-"}</p>
+                      <p className="line-clamp-1 text-sm text-slate-500">
+                        {food.description}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      {formatPrice(food.price || 0)}
+                    </td>
+                    <td className="px-4 py-3">
+                      {food.priceDiscount
+                        ? formatPrice(food.priceDiscount)
+                        : "-"}
+                    </td>
+                    <td className="px-4 py-3">★ {food.rating || "-"}</td>
+                    <td className="px-4 py-3">{food.totalLikes || 0}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        <Link
+                          to={ROUTES.ADMIN_EDIT_FOOD(food.id)}
+                          className="border border-slate-300 px-3 py-1 font-bold"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => removeFood(food)}
+                          disabled={deletingId === food.id}
+                          className="bg-red-600 px-3 py-1 font-bold text-white disabled:opacity-60"
+                        >
+                          {deletingId === food.id ? "Menghapus..." : "Hapus"}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

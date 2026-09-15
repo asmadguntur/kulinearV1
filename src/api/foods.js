@@ -18,13 +18,13 @@ export async function createFood(payload) {
 
 export async function updateFood(foodId, payload) {
   const response = await apiClient.post(
-    ENDPOINTS.FOODS.UPDATE_BY_ID(foodId),
+    ENDPOINTS.FOODS.UPDATE(foodId),
     payload,
   );
   return response.data.data;
 }
 
 export async function deleteFood(foodId) {
-  const response = await apiClient.delete(ENDPOINTS.FOODS.DELETE_BY_ID(foodId));
+  const response = await apiClient.delete(ENDPOINTS.FOODS.DELETE(foodId));
   return response.data;
 }
