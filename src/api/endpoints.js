@@ -4,8 +4,8 @@ export const ENDPOINTS = {
     GET_ALL: "/foods",
     GET_BY_ID: (foodId) => `/foods/${foodId}`,
     CREATE: "/create-food",
-    UPDATE: (foodId) => `/update-food/${foodId}`,
-    DELETE: (foodId) => `/delete-food/${foodId}`,
+    UPDATE_BY_ID: (foodId) => `/update-food/${foodId}`,
+    DELETE_BY_ID: (foodId) => `/delete-food/${foodId}`,
   },
   FAVORITES: { LIKE: "/like", UNLIKE: "/unlike", GET_LIKED: "/like-foods" },
   RATINGS: {

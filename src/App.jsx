@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 
 import { ROUTES } from "@/constants";
 import AdminLayout from "@/layouts/AdminLayout";
+import AdminFoodsPage from "@/pages/AdminFoodsPage";
 import AuthLayout from "@/layouts/AuthLayout";
 import MainLayout from "@/layouts/MainLayout";
 import { AdminRoute, ProtectedRoute, UserRoute } from "@/layouts/RouteGuard";
@@ -68,10 +69,7 @@ export default function App() {
                   index
                   element={<PlaceholderPage title="Admin dashboard" />}
                 />
-                <Route
-                  path="foods"
-                  element={<PlaceholderPage title="Manage foods" />}
-                />
+                <Route path="foods" element={<AdminFoodsPage />} />
                 <Route
                   path="foods/create"
                   element={<PlaceholderPage title="Create food" />}

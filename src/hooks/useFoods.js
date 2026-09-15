@@ -20,16 +20,18 @@ export function useFoods() {
   useEffect(() => {
     fetchFoods();
   }, [fetchFoods]);
-  return { foods, ...state, refetch: fetchFoods };
+  return { foods, setFoods, ...state, refetch: fetchFoods };
 }
 
 export function useFoodDetail(foodId) {
   const [state, setState] = useState({
     food: null,
-    loading: true,
+    loading: Boolean(foodId),
     error: null,
   });
+
   useEffect(() => {
+    if (!foodId) return;
     let active = true;
     getFoodById(foodId)
       .then((food) => {
