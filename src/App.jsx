@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { ROUTES } from "@/constants";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminFoodsPage from "@/pages/AdminFoodsPage";
+import AdminFoodFormPage from "@/pages/AdminFoodFormPage";
 import AuthLayout from "@/layouts/AuthLayout";
 import MainLayout from "@/layouts/MainLayout";
 import { AdminRoute, ProtectedRoute, UserRoute } from "@/layouts/RouteGuard";
@@ -72,11 +73,11 @@ export default function App() {
                 <Route path="foods" element={<AdminFoodsPage />} />
                 <Route
                   path="foods/create"
-                  element={<PlaceholderPage title="Create food" />}
+                  element={<AdminFoodFormPage mode="create" />}
                 />
                 <Route
                   path="foods/:foodId/edit"
-                  element={<PlaceholderPage title="Edit food" />}
+                  element={<AdminFoodFormPage mode="edit" />}
                 />
                 <Route path="users" element={<AdminUsersPage />} />
                 <Route
