@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import { getErrorMessage } from "@/api/client";
 import { createFood, updateFood } from "@/api/foods";
 import { ROUTES } from "@/constants";
-import { FALLBACK_FOOD_IMAGE } from "@/data/demoFoods";
+
 import { useFoodDetail } from "@/hooks/useFoods";
 
 const EMPTY_FORM = {
@@ -34,9 +34,12 @@ function FoodForm({ mode, foodId, initialFood }) {
       : EMPTY_FORM,
   );
   const [status, setStatus] = useState({ loading: false, error: "" });
+  const [imageError, setImageError] = useState(false);
 
-  const update = (event) =>
+  const update = (event) => {
+    if (event.target.name === "imageUrl") setImageError(false);
     setForm({ ...form, [event.target.name]: event.target.value });
+  };
 
   const submit = async (event) => {
     event.preventDefault();
@@ -87,9 +90,7 @@ function FoodForm({ mode, foodId, initialFood }) {
       className="mt-6 max-w-3xl border border-slate-200 bg-white p-6 shadow-[6px_6px_0_#2e6dfa]"
     >
       <div className="grid gap-4 md:grid-cols-2">
-        {/* Nama, Harga, Harga diskon, URL gambar */}
-        {/* Deskripsi dan Bahan: tambahkan className="md:col-span-2" pada label */}
-        <label className="flex flex-col">
+        <label className="flex flex-col md:col-span-2">
           <span className="font-bold">Nama</span>
           <input
             type="text"
@@ -125,11 +126,13 @@ function FoodForm({ mode, foodId, initialFood }) {
         <label className="flex flex-col">
           <span className="font-bold">URL Gambar</span>
           <input
-            type="text"
+            type="url"
             name="imageUrl"
             value={form.imageUrl}
             onChange={update}
+            placeholder="https://example.com/image.jpg"
             className={inputClass}
+            required
           />
         </label>
 
@@ -157,14 +160,21 @@ function FoodForm({ mode, foodId, initialFood }) {
       </div>
 
       {form.imageUrl && (
-        <img
-          src={form.imageUrl}
-          alt=""
-          onError={(event) => {
-            event.currentTarget.src = FALLBACK_FOOD_IMAGE;
-          }}
-          className="mt-4 h-40 w-full max-w-xs rounded object-cover"
-        />
+        <>
+          {imageError ? (
+            <p className="mt-4 border border-amber-200 bg-amber-50 p-3 text-base text-amber-800">
+              URL gambar tidak bisa dimuat. Periksa kembali alamatnya.
+            </p>
+          ) : (
+            <img
+              src={form.imageUrl}
+              alt="Preview"
+              className="mt-4 h-48 w-full rounded-lg object-cover"
+              onError={() => setImageError(true)}
+              onLoad={() => setImageError(false)}
+            />
+          )}
+        </>
       )}
 
       {status.error && (
