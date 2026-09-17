@@ -59,7 +59,11 @@ export default function App() {
               path="/transactions/:transactionId"
               element={<PlaceholderPage title="Transaction detail" />}
             />
-            <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+            <Route
+              path={ROUTES.PROFILE}
+              element={<ProfilePage />}
+              key="profile"
+            />
 
             {/* Butuh role admin */}
             <Route element={<AdminRoute />}>
@@ -72,10 +76,12 @@ export default function App() {
                 <Route
                   path="foods/create"
                   element={<AdminFoodFormPage mode="create" />}
+                  key="create"
                 />
                 <Route
                   path="foods/:foodId/edit"
                   element={<AdminFoodFormPage mode="edit" />}
+                  key="edit"
                 />
                 <Route path="users" element={<AdminUsersPage />} />
                 <Route

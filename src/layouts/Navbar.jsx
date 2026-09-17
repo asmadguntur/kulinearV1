@@ -61,6 +61,25 @@ export default function Navbar() {
               </sup>
             </Link>
             <span className="hidden h-6 w-px bg-slate-200 md:block" />
+            <NavLink
+              to={ROUTES.PROFILE}
+              className={linkClass + " flex items-center gap-2"}
+            >
+              {/* picture */}
+              {user?.profilePictureUrl ? (
+                <img
+                  src={user.profilePictureUrl}
+                  alt="Profile"
+                  className="h-6 w-6 rounded-full"
+                />
+              ) : (
+                (user?.name || "Profile").charAt(0).toUpperCase()
+              )}
+              {/* name */}
+              <span className="ml-2 hidden text-base font-semibold text-navy md:inline">
+                {user?.name || "Profile"}
+              </span>
+            </NavLink>
             <button
               onClick={logout}
               className="hidden text-base font-semibold text-slate-600 hover:text-primary md:block"

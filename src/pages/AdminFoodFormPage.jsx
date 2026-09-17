@@ -132,7 +132,7 @@ function FoodForm({ mode, foodId, initialFood }) {
             onChange={update}
             placeholder="https://example.com/image.jpg"
             className={inputClass}
-            required
+            re
           />
         </label>
 

@@ -15,7 +15,8 @@ export async function updateUserRole(userId, role) {
 
 export async function getCurrentUser() {
   const response = await apiClient.get(ENDPOINTS.USERS.CURRENT_USER);
-  return response.data.data;
+  // return response.data.data;
+  return response.data.data ?? response.data.user ?? response.data;
 }
 
 export async function updateProfile(payload) {
