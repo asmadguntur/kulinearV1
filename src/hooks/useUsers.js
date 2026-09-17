@@ -1,35 +1,120 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { getAllUsers } from "@/api/users";
+import { getAllUsers, getCurrentUser } from "@/api/users";
 
 export function useUsers() {
   const [users, setUsers] = useState([]);
-  const [state, setState] = useState({ loading: true, error: null });
+
+  const [state, setState] = useState({
+    user: null,
+    loading: true,
+    error: null,
+  });
+
   // Menaikkan angka ini memicu effect di bawah untuk mengambil data lagi.
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
+
+    getCurrentUser()
+      .then((currentUser) => {
+        if (!active) return;
+
+        setState((prev) => ({
+          ...prev,
+          user: currentUser,
+        }));
+      })
+      .catch((error) => {
+        if (active) {
+          setState((prev) => ({
+            ...prev,
+            error,
+          }));
+        }
+      });
+
     getAllUsers()
       .then((data) => {
         if (!active) return;
+
         setUsers(Array.isArray(data) ? data : []);
-        setState({ loading: false, error: null });
+
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: null,
+        }));
       })
       .catch((error) => {
-        if (active) setState({ loading: false, error });
+        if (active) {
+          setState((prev) => ({
+            ...prev,
+            loading: false,
+            error,
+          }));
+        }
       });
+
     return () => {
       active = false;
     };
   }, [reloadKey]);
 
   const refetch = useCallback(() => {
-    setState({ loading: true, error: null });
+    setState((prev) => ({
+      ...prev,
+      loading: true,
+      error: null,
+    }));
+
     setReloadKey((key) => key + 1);
   }, []);
 
-  // setUsers ikut dikembalikan supaya halaman bisa memperbarui satu baris
-  // (misalnya role) tanpa memuat ulang seluruh daftar.
-  return { users, setUsers, ...state, refetch };
+  return {
+    users,
+    setUsers,
+    ...state,
+    refetch,
+  };
+}
+
+// Digunakan khusus untuk halaman Profile
+export function useCurrentUser() {
+  const [state, setState] = useState({
+    user: null,
+    loading: true,
+    error: null,
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    getCurrentUser()
+      .then((user) => {
+        if (active) {
+          setState({
+            user,
+            loading: false,
+            error: null,
+          });
+        }
+      })
+      .catch((error) => {
+        if (active) {
+          setState({
+            user: null,
+            loading: false,
+            error,
+          });
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return state;
 }

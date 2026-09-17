@@ -17,6 +17,7 @@ import LandingPage from "@/pages/LandingPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import PlaceholderPage from "@/pages/PlaceholderPage";
 import UnauthorizedPage from "@/pages/UnauthorizedPage";
+import ProfilePage from "@/pages/ProfilePage";
 
 export default function App() {
   return (
@@ -58,10 +59,7 @@ export default function App() {
               path="/transactions/:transactionId"
               element={<PlaceholderPage title="Transaction detail" />}
             />
-            <Route
-              path={ROUTES.PROFILE}
-              element={<PlaceholderPage title="Profile" />}
-            />
+            <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
 
             {/* Butuh role admin */}
             <Route element={<AdminRoute />}>
