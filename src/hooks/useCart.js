@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { addCart, getCarts } from "@/api/carts";
+import { addCart, getCarts, deleteCart, updateCart } from "@/api/carts";
 import { getErrorMessage } from "@/api/client";
 
 // enabled: false dipakai untuk role selain user (misalnya admin), supaya
@@ -11,6 +11,10 @@ export function useCart({ enabled = true } = {}) {
   const [actionError, setActionError] = useState("");
   // adding dipakai untuk menonaktifkan tombol selama request berjalan.
   const [adding, setAdding] = useState(false);
+
+  // menyimpan cartId yang sedang diproses update/delete, supaya tombolnya bisa dinonaktifkan.
+  const [pendingId, setPendingId] = useState([]);
+
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
@@ -61,6 +65,57 @@ export function useCart({ enabled = true } = {}) {
     [refetch],
   );
 
+  const removeItem = useCallback(
+    async (cartId) => {
+      setActionError("");
+      setPendingId((ids) => [...ids, cartId]);
+      try {
+        await deleteCart(cartId);
+        refetch();
+        return true;
+      } catch (error) {
+        setActionError(getErrorMessage(error));
+        return false;
+      } finally {
+        setPendingId((ids) => ids.filter((id) => id !== cartId));
+      }
+    },
+    [refetch],
+  );
+
+  const changeQuantity = useCallback(
+    async (cartId, step) => {
+      const cart = carts.find((item) => item.id === cartId);
+      if (!cart) return false;
+      const newQuantity = Math.max(1, cart.quantity + step);
+      return updateItem(cartId, newQuantity);
+    },
+    [carts],
+  );
+
+  const updateItem = useCallback(
+    async (cartId, quantity) => {
+      setActionError("");
+      setPendingId((ids) => [...ids, cartId]);
+      try {
+        await updateCart(cartId, quantity);
+        refetch();
+        return true;
+      } catch (error) {
+        setActionError(getErrorMessage(error));
+        return false;
+      } finally {
+        setPendingId((ids) => ids.filter((id) => id !== cartId));
+      }
+    },
+    [refetch],
+  );
+
+  const isPending = useCallback(
+    (cartId) => pendingId.includes(cartId),
+    [pendingId],
+  );
+
   return {
     carts,
     ...state,
@@ -69,5 +124,8 @@ export function useCart({ enabled = true } = {}) {
     totalQuantity,
     addItem,
     refetch,
+    removeItem,
+    updateItem,
+    isPending,
   };
 }

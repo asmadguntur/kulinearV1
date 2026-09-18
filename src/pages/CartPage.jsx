@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { ROUTES } from "@/constants";
-import { demoFoods } from "@/data/demoFoods";
+// import { demoFoods } from "@/data/demoFoods";
 import { formatPrice } from "@/lib/format";
 
 export default function CartPage() {
