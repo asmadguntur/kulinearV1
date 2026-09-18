@@ -23,9 +23,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Halaman tanpa navbar: login & register.
-            key berbeda supaya React membuat AuthPage baru saat pindah halaman,
-            bukan memakai ulang state form yang lama. */}
         <Route element={<AuthLayout />}>
           <Route
             path={ROUTES.LOGIN}

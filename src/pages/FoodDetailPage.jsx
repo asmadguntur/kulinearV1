@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { ROLES, ROUTES } from "@/constants";
+import { useCart } from "@/hooks/useCart";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useFoodDetail } from "@/hooks/useFoods";
 import { FALLBACK_FOOD_IMAGE, getDemoFood } from "@/data/demoFoods";
@@ -12,6 +14,10 @@ export default function FoodDetailPage() {
   // Favorit hanya untuk role user; admin tidak melihat tombol favorit.
   const isUser = authStorage.getUser()?.role === ROLES.USER;
   const favorite = useFavorites({ enabled: isUser });
+  // Keranjang juga khusus role user, sama seperti favorit.
+  const cart = useCart({ enabled: isUser });
+  const [quantity, setQuantity] = useState(1);
+  const [addedMessage, setAddedMessage] = useState("");
   // Data contoh dipakai sebagai cadangan kalau API belum/gagal mengirim detail.
   const fallback = getDemoFood(foodId);
   const visualFood = {
@@ -27,6 +33,16 @@ export default function FoodDetailPage() {
   const favoriteDisabled = favorite.loading || favorite.isPending(foodId);
   const toggleFavorite = () =>
     favorite.toggleFavorite({ ...visualFood, id: foodId });
+
+  // Jumlah minimal 1, supaya tidak pernah mengirim 0 ke API.
+  const changeQuantity = (step) =>
+    setQuantity((value) => Math.max(1, value + step));
+
+  const addToCart = async () => {
+    setAddedMessage("");
+    const saved = await cart.addItem(foodId, quantity);
+    if (saved) setAddedMessage(`${quantity} item masuk ke keranjang.`);
+  };
 
   if (loading)
     return (
@@ -103,9 +119,23 @@ export default function FoodDetailPage() {
                 {formatPrice(visualFood.price)}
               </p>
               <div className="flex items-center gap-4 rounded border border-slate-100 px-3 py-2 text-base">
-                <button>-</button>
-                <b>1</b>
-                <button>+</button>
+                <button
+                  type="button"
+                  onClick={() => changeQuantity(-1)}
+                  disabled={quantity <= 1}
+                  aria-label="Kurangi jumlah"
+                  className="disabled:opacity-40"
+                >
+                  -
+                </button>
+                <b>{quantity}</b>
+                <button
+                  type="button"
+                  onClick={() => changeQuantity(1)}
+                  aria-label="Tambah jumlah"
+                >
+                  +
+                </button>
               </div>
             </div>
           </div>
@@ -113,9 +143,29 @@ export default function FoodDetailPage() {
             {visualFood.description ||
               "Nikmati hidangan pilihan dengan cita rasa khas KULINEAR."}
           </p>
-          <button className="mt-6 w-full rounded-lg bg-primary py-3 text-base font-bold text-white">
-            🛒　Tambah ke Keranjang
-          </button>
+          {isUser && (
+            <button
+              type="button"
+              onClick={addToCart}
+              disabled={cart.adding}
+              className="mt-6 w-full rounded-lg bg-primary py-3 text-base font-bold text-white disabled:opacity-50"
+            >
+              {cart.adding ? "Menyimpan..." : "🛒　Tambah ke Keranjang"}
+            </button>
+          )}
+          {addedMessage && (
+            <p className="mt-3 rounded-lg bg-emerald-50 p-3 text-base text-emerald-700">
+              {addedMessage}{" "}
+              <Link to={ROUTES.CART} className="font-bold underline">
+                Lihat keranjang
+              </Link>
+            </p>
+          )}
+          {cart.actionError && (
+            <p className="mt-3 rounded-lg bg-red-50 p-3 text-base text-red-700">
+              {cart.actionError}
+            </p>
+          )}
           {isUser && (
             <button
               type="button"
