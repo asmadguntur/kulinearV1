@@ -3,10 +3,19 @@ import { Link } from "react-router";
 import { ROUTES } from "@/constants";
 // import { demoFoods } from "@/data/demoFoods";
 import { formatPrice } from "@/lib/format";
+import { useCart } from "@/hooks/useCart";
+
+const SHIPPING_COST = 10000;
+const DISCOUNT = 5000;
 
 export default function CartPage() {
-  const cartItems = demoFoods.slice(0, 2);
-  const subtotal = 35000 + 56000;
+  const cart = useCart();
+  const subtotal = cart.carts.reduce(
+    (total, item) => total + (item.price || 0) * (item.quantity || 0),
+    0,
+  );
+  const discount = cart.carts.length > 0 ? DISCOUNT : 0;
+  const total = subtotal + SHIPPING_COST - discount;
 
   return (
     <section className="mx-auto max-w-[1110px] px-5 py-8">
@@ -29,7 +38,7 @@ export default function CartPage() {
             <h2 className="border-b border-slate-200 pb-4 text-base font-extrabold">
               Daftar Pesanan
             </h2>
-            {cartItems.map((food, index) => (
+            {cart.carts.map((food) => (
               <div
                 key={food.id}
                 className="flex gap-4 border-b border-slate-100 py-4 last:border-0"
@@ -42,7 +51,7 @@ export default function CartPage() {
                 <div className="flex-1">
                   <p className="text-base font-bold">{food.name}</p>
                   <p className="mt-1 text-base text-slate-500">
-                    {index + 1}x × {formatPrice(food.price)}
+                    {food.quantity}x × {formatPrice(food.price)}
                   </p>
                 </div>
                 <button className="text-base text-red-400">Hapus</button>
@@ -72,21 +81,21 @@ export default function CartPage() {
           </h2>
           <div className="space-y-3 py-4 text-base">
             <div className="flex justify-between text-slate-500">
-              <span>Total Harga (3 Barang)</span>
+              <span>Total Harga ({cart.totalQuantity} Barang)</span>
               <span>{formatPrice(subtotal)}</span>
             </div>
             <div className="flex justify-between text-slate-500">
               <span>Ongkos Kirim</span>
-              <span>Rp 10.000</span>
+              <span>{formatPrice(SHIPPING_COST)}</span>
             </div>
             <div className="flex justify-between text-emerald-500">
               <span>Diskon Promo</span>
-              <span>-Rp 5.000</span>
+              <span>-{formatPrice(discount)}</span>
             </div>
           </div>
           <div className="flex justify-between border-t border-slate-200 pt-4 font-extrabold">
             <span>Total Pembayaran</span>
-            <span className="text-primary">Rp 96.000</span>
+            <span className="text-primary">{formatPrice(total)}</span>
           </div>
           <Link
             to={ROUTES.TRANSACTIONS}

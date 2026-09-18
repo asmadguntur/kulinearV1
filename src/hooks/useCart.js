@@ -125,6 +125,7 @@ export function useCart({ enabled = true } = {}) {
     addItem,
     refetch,
     removeItem,
+    changeQuantity,
     updateItem,
     isPending,
   };
