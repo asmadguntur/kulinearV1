@@ -83,16 +83,6 @@ export function useCart({ enabled = true } = {}) {
     [refetch],
   );
 
-  const changeQuantity = useCallback(
-    async (cartId, step) => {
-      const cart = carts.find((item) => item.id === cartId);
-      if (!cart) return false;
-      const newQuantity = Math.max(1, cart.quantity + step);
-      return updateItem(cartId, newQuantity);
-    },
-    [carts],
-  );
-
   const updateItem = useCallback(
     async (cartId, quantity) => {
       setActionError("");
@@ -109,6 +99,14 @@ export function useCart({ enabled = true } = {}) {
       }
     },
     [refetch],
+  );
+
+  const changeQuantity = useCallback(
+    (cartId, quantity) => {
+      if (quantity < 1) return;
+      return updateItem(cartId, quantity);
+    },
+    [updateItem],
   );
 
   const isPending = useCallback(

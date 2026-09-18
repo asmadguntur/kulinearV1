@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router";
 import { ROLES, ROUTES } from "@/constants";
 import { authStorage } from "@/lib/authStorage";
 import { useState } from "react";
+import { useCart } from "@/hooks/useCart";
 
 const navItems = [
   ["Jelajahi Makanan", ROUTES.FOODS],
@@ -13,6 +14,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const isSignedIn = Boolean(authStorage.getToken());
   const user = authStorage.getUser();
+  const cart = useCart();
   const isAdmin = user?.role === ROLES.ADMIN;
   const items = isAdmin
     ? [...navItems, ["Admin Console", ROUTES.ADMIN]]
@@ -57,7 +59,11 @@ export default function Navbar() {
             >
               🛒
               <sup className="ml-0.5 rounded-full bg-accent px-1 text-xs text-white">
-                3
+                {/* total barang */}
+                {cart.carts.reduce(
+                  (total, item) => total + Number(item.quantity || 0),
+                  0,
+                )}
               </sup>
             </Link>
             <span className="hidden h-6 w-px bg-slate-200 md:block" />
