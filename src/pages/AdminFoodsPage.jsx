@@ -72,7 +72,7 @@ export default function AdminFoodsPage() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="flex  flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-base font-bold uppercase tracking-[0.2em] text-accent">
             Manage foods
