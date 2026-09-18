@@ -45,9 +45,11 @@ export default function App() {
             {/* Khusus role user */}
             <Route element={<UserRoute />}>
               <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
+              <Route path={ROUTES.CART} element={<CartPage />} />
+              <Route path={ROUTES.CHECKOUT} element={<CartPage />} />
             </Route>
-            <Route path={ROUTES.CART} element={<CartPage />} />
-            <Route path={ROUTES.CHECKOUT} element={<CartPage />} />
+            {/* <Route path={ROUTES.CART} element={<CartPage />} />
+            <Route path={ROUTES.CHECKOUT} element={<CartPage />} /> */}
             <Route
               path={ROUTES.TRANSACTIONS}
               element={<PlaceholderPage title="Transactions" />}
