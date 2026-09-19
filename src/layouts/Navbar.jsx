@@ -3,6 +3,7 @@ import { ROLES, ROUTES } from "@/constants";
 import { authStorage } from "@/lib/authStorage";
 import { useState } from "react";
 import { useCart } from "@/hooks/useCart";
+import { useCartStore } from "@/store/cartStore";
 
 const navItems = [
   ["Jelajahi Makanan", ROUTES.FOODS],
@@ -14,8 +15,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const isSignedIn = Boolean(authStorage.getToken());
   const user = authStorage.getUser();
-  const cart = useCart();
   const isAdmin = user?.role === ROLES.ADMIN;
+  const cart = useCart({ enabled: isSignedIn && !isAdmin });
   const items = isAdmin
     ? [...navItems, ["Admin Console", ROUTES.ADMIN]]
     : [...navItems, ["Favorit", ROUTES.FAVORITES]];
@@ -23,6 +24,7 @@ export default function Navbar() {
   const logout = () => {
     setMenuOpen(false);
     authStorage.clear();
+    useCartStore.getState().reset();
     navigate(ROUTES.LANDING);
   };
 
@@ -52,18 +54,16 @@ export default function Navbar() {
         )}
         {isSignedIn ? (
           <div className="ml-auto flex items-center gap-4">
+            {/* total quantity get from Zustand store, not from localStorage, so
+            it will update automatically when user add/remove item in cart. */}
             <Link
               to={ROUTES.CART}
               className="text-base text-navy"
               aria-label="Cart"
             >
               🛒
-              <sup className="ml-0.5 rounded-full bg-accent px-1 text-xs text-white">
-                {/* total barang */}
-                {cart.carts.reduce(
-                  (total, item) => total + Number(item.quantity || 0),
-                  0,
-                )}
+              <sup className="ml-0.5 rounded-full bg-accent px-1 text-sm text-white">
+                {cart.totalQuantity}
               </sup>
             </Link>
             <span className="hidden h-6 w-px bg-slate-200 md:block" />
@@ -71,11 +71,12 @@ export default function Navbar() {
               to={ROUTES.PROFILE}
               className={linkClass + " flex items-center gap-2"}
             >
-              {/* name */}
+              {/* name and profile picture will update automatically when user
+              update profile, because we use Zustand store to manage user
+              state. */}
               <span className="hidden text-base font-semibold text-navy md:inline">
                 Halo, {user?.name || "Profile"}
               </span>
-
               {/* picture */}
               {user?.profilePictureUrl ? (
                 <img
