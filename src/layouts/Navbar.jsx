@@ -62,7 +62,7 @@ export default function Navbar() {
               aria-label="Cart"
             >
               🛒
-              <sup className="ml-0.5 rounded-full bg-accent px-1 text-sm text-white">
+              <sup className="ml-0.5 rounded-full bg-accent px-1 text-xs text-white">
                 {cart.totalQuantity}
               </sup>
             </Link>
