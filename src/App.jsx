@@ -18,6 +18,7 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import PlaceholderPage from "@/pages/PlaceholderPage";
 import UnauthorizedPage from "@/pages/UnauthorizedPage";
 import ProfilePage from "@/pages/ProfilePage";
+import RatingPage from "@/pages/RatingPage";
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path={ROUTES.FOODS} element={<FoodPage />} />
             <Route path="/foods/:foodId" element={<FoodDetailPage />} />
+            <Route path="/foods/:foodId/rating" element={<RatingPage />} />
             {/* Khusus role user */}
             <Route element={<UserRoute />}>
               <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />

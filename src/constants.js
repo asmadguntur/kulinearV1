@@ -6,6 +6,7 @@ export const ROUTES = {
   REGISTER: "/register",
   FOODS: "/foods",
   FOOD_DETAIL: (foodId) => `/foods/${foodId}`,
+  FOOD_RATING: (foodId) => `/foods/${foodId}/rating`,
   FAVORITES: "/favorites",
   CART: "/cart",
   CHECKOUT: "/checkout",

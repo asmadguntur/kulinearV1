@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { ROLES, ROUTES } from "@/constants";
 import { useCart } from "@/hooks/useCart";
+import { useRatings } from "@/hooks/useRatings";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useFoodDetail } from "@/hooks/useFoods";
 import { FALLBACK_FOOD_IMAGE, getDemoFood } from "@/data/demoFoods";
@@ -11,6 +12,7 @@ import { formatPrice } from "@/lib/format";
 export default function FoodDetailPage() {
   const { foodId } = useParams();
   const { food, loading } = useFoodDetail(foodId);
+  const { total: totalUlasan, average } = useRatings(foodId);
   // Favorit hanya untuk role user; admin tidak melihat tombol favorit.
   const isUser = authStorage.getUser()?.role === ROLES.USER;
   const favorite = useFavorites({ enabled: isUser });

@@ -4,6 +4,7 @@ import { authStorage } from "@/lib/authStorage";
 import { useState } from "react";
 import { useCart } from "@/hooks/useCart";
 import { useCartStore } from "@/store/cartStore";
+import { useRatingStore } from "@/store/ratingStore";
 
 const navItems = [
   ["Jelajahi Makanan", ROUTES.FOODS],
@@ -25,6 +26,7 @@ export default function Navbar() {
     setMenuOpen(false);
     authStorage.clear();
     useCartStore.getState().reset();
+    useRatingStore.getState().reset();
     navigate(ROUTES.LANDING);
   };
 

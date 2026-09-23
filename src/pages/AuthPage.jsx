@@ -44,6 +44,7 @@ export default function AuthPage({ mode }) {
         authStorage.setToken(response.token);
         if (response.user) authStorage.setUser(response.user);
         useCartStore.getState().reset(); // reset cart store saat login/logout
+        useRatingStore.getState().reset(); // reset rating store saat login/logout
         const isAdmin = response.user?.role === ROLES.ADMIN;
         const homePage = isAdmin ? ROUTES.ADMIN : ROUTES.FOODS;
         navigate(location.state?.from || homePage, { replace: true });
