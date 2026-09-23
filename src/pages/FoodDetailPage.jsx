@@ -74,16 +74,21 @@ export default function FoodDetailPage() {
           <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between">
               <h2 className="text-base font-extrabold">Rating & Ulasan</h2>
-              <button className="rounded bg-orange-50 px-4 py-2 text-base font-bold text-accent">
+              <Link
+                to={ROUTES.FOOD_RATING(foodId)}
+                className="rounded bg-orange-50 px-4 py-2 text-base font-bold text-accent"
+              >
                 Tulis Ulasan
-              </button>
+              </Link>
             </div>
             <div className="mt-5 flex items-center gap-5">
-              <strong className="text-4xl">{visualFood.rating}</strong>
+              <strong className="text-4xl">
+                {totalUlasan > 0 ? average.toFixed(1) : visualFood.rating}
+              </strong>
               <span className="text-base text-slate-500">
                 ★ dari 5.0
                 <br />
-                98% pelanggan sangat puas
+                {totalUlasan} pelanggan sangat puas
               </span>
             </div>
           </div>

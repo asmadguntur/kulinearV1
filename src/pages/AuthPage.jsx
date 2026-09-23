@@ -5,6 +5,8 @@ import { ROLES, ROUTES } from "@/constants";
 import { authStorage } from "@/lib/authStorage";
 import { loginUser, registerUser } from "@/api/auth";
 import { getErrorMessage } from "@/api/client";
+import { useCartStore } from "@/store/cartStore";
+import { useRatingStore } from "@/store/ratingStore";
 
 export default function AuthPage({ mode }) {
   const isLogin = mode === "login";
