@@ -20,7 +20,9 @@ const FILTERS = [
 function matchesKeyword(food, keyword) {
   const haystack = [food.name, food.description, ...(food.ingredients || [])];
   return haystack.some((text) =>
-    String(text || "").toLowerCase().includes(keyword),
+    String(text || "")
+      .toLowerCase()
+      .includes(keyword),
   );
 }
 
@@ -28,6 +30,7 @@ export default function FoodPage() {
   const { foods, loading, error, refetch } = useFoods();
   // Favorit hanya untuk role user; admin tidak melihat tombol ♡.
   const isUser = authStorage.getUser()?.role === ROLES.USER;
+  const user = authStorage.getUser();
   const favorite = useFavorites({ enabled: isUser });
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
@@ -72,8 +75,13 @@ export default function FoodPage() {
     <section className="mx-auto max-w-[1110px] px-5 py-7 md:py-10">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-base text-slate-500">Lokasi Pengantaran</p>
-          <h1 className="text-base font-extrabold">Rumah (Andi Wijaya)</h1>
+          <h1 className="text-2xl font-extrabold sm:text-3xl">
+            Halo, {user?.name ?? "Pencinta Rasa"}! 👋
+          </h1>
+          <p className="mt-2 text-sm text-muted">
+            Mau berburu kelezatan apa hari ini? Temukan rekomendasi spesial
+            Anda.
+          </p>
         </div>
         <Link to={ROUTES.CART} className="text-2xl text-primary">
           🛒
