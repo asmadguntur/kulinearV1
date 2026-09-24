@@ -5,11 +5,10 @@ import { useState } from "react";
 import { useCart } from "@/hooks/useCart";
 import { useCartStore } from "@/store/cartStore";
 import { useRatingStore } from "@/store/ratingStore";
+import { useAdminTransactionStore } from "@/store/adminTransactionStore";
+import { useTransactionStore } from "@/store/transactionStore";
 
-const navItems = [
-  ["Jelajahi Makanan", ROUTES.FOODS],
-  ["Pesanan Saya", ROUTES.TRANSACTIONS],
-];
+const navItems = [["Jelajahi Makanan", ROUTES.FOODS]];
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -20,13 +19,19 @@ export default function Navbar() {
   const cart = useCart({ enabled: isSignedIn && !isAdmin });
   const items = isAdmin
     ? [...navItems, ["Admin Console", ROUTES.ADMIN]]
-    : [...navItems, ["Favorit", ROUTES.FAVORITES]];
+    : [
+        ...navItems,
+        ["Pesanan Saya", ROUTES.TRANSACTIONS],
+        ["Favorit", ROUTES.FAVORITES],
+      ];
 
   const logout = () => {
     setMenuOpen(false);
     authStorage.clear();
     useCartStore.getState().reset();
     useRatingStore.getState().reset();
+    useTransactionStore.getState().reset();
+    useAdminTransactionStore.getState().reset();
     navigate(ROUTES.LANDING);
   };
 

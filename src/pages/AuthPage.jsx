@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-
 import { ROLES, ROUTES } from "@/constants";
 import { authStorage } from "@/lib/authStorage";
 import { loginUser, registerUser } from "@/api/auth";
 import { getErrorMessage } from "@/api/client";
 import { useCartStore } from "@/store/cartStore";
 import { useRatingStore } from "@/store/ratingStore";
+import { useAdminTransactionStore } from "@/store/adminTransactionStore";
+import { useTransactionStore } from "@/store/transactionStore";
 
 export default function AuthPage({ mode }) {
   const isLogin = mode === "login";
@@ -47,6 +48,10 @@ export default function AuthPage({ mode }) {
         if (response.user) authStorage.setUser(response.user);
         useCartStore.getState().reset(); // reset cart store saat login/logout
         useRatingStore.getState().reset(); // reset rating store saat login/logout
+        useTransactionStore.getState().reset(); // reset transaction store saat login/logout
+        useAdminTransactionStore.getState().reset(); // reset admin transaction store saat login/logout
+        // Jika user login dari halaman register, redirect ke halaman asal.
+        // Jika user login dari halaman lain, redirect ke home page sesuai role.
         const isAdmin = response.user?.role === ROLES.ADMIN;
         const homePage = isAdmin ? ROUTES.ADMIN : ROUTES.FOODS;
         navigate(location.state?.from || homePage, { replace: true });

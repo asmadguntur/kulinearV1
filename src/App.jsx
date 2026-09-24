@@ -1,24 +1,27 @@
+import { AdminRoute, ProtectedRoute, UserRoute } from "@/layouts/RouteGuard";
 import { BrowserRouter, Route, Routes } from "react-router";
-
 import { ROUTES } from "@/constants";
+
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminFoodsPage from "@/pages/AdminFoodsPage";
 import AdminFoodFormPage from "@/pages/AdminFoodFormPage";
-import AuthLayout from "@/layouts/AuthLayout";
-import MainLayout from "@/layouts/MainLayout";
-import { AdminRoute, ProtectedRoute, UserRoute } from "@/layouts/RouteGuard";
+import AdminTransactionsPage from "@/pages/AdminTransactionsPage";
 import AdminUsersPage from "@/pages/AdminUsersPage";
+import AuthLayout from "@/layouts/AuthLayout";
 import AuthPage from "@/pages/AuthPage";
 import CartPage from "@/pages/CartPage";
 import FavoritesPage from "@/pages/FavoritesPage";
 import FoodDetailPage from "@/pages/FoodDetailPage";
 import FoodPage from "@/pages/FoodPage";
 import LandingPage from "@/pages/LandingPage";
+import MainLayout from "@/layouts/MainLayout";
 import NotFoundPage from "@/pages/NotFoundPage";
 import PlaceholderPage from "@/pages/PlaceholderPage";
-import UnauthorizedPage from "@/pages/UnauthorizedPage";
 import ProfilePage from "@/pages/ProfilePage";
+import TransactionDetailPage from "@/pages/TransactionDetailPage";
+import TransactionPage from "@/pages/TransactionPage";
 import RatingPage from "@/pages/RatingPage";
+import UnauthorizedPage from "@/pages/UnauthorizedPage";
 
 export default function App() {
   return (
@@ -49,17 +52,14 @@ export default function App() {
               <Route path={ROUTES.FAVORITES} element={<FavoritesPage />} />
               <Route path={ROUTES.CART} element={<CartPage />} />
               <Route path={ROUTES.CHECKOUT} element={<CartPage />} />
+              <Route path={ROUTES.TRANSACTIONS} element={<TransactionPage />} />
+              <Route
+                path="/transactions/:transactionId"
+                element={<TransactionDetailPage />}
+              />
             </Route>
             {/* <Route path={ROUTES.CART} element={<CartPage />} />
             <Route path={ROUTES.CHECKOUT} element={<CartPage />} /> */}
-            <Route
-              path={ROUTES.TRANSACTIONS}
-              element={<PlaceholderPage title="Transactions" />}
-            />
-            <Route
-              path="/transactions/:transactionId"
-              element={<PlaceholderPage title="Transaction detail" />}
-            />
             <Route
               path={ROUTES.PROFILE}
               element={<ProfilePage />}
@@ -87,7 +87,7 @@ export default function App() {
                 <Route path="users" element={<AdminUsersPage />} />
                 <Route
                   path="transactions"
-                  element={<PlaceholderPage title="Manage transactions" />}
+                  element={<AdminTransactionsPage />}
                 />
               </Route>
             </Route>
