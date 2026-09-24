@@ -1,26 +1,46 @@
-import { Link } from "react-router";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
 
+import { getErrorMessage } from "@/api/client";
 import { ROUTES } from "@/constants";
-import { authStorage } from "@/lib/authStorage";
-import { formatPrice } from "@/lib/format";
 import { FALLBACK_FOOD_IMAGE } from "@/data/demoFoods";
 import { useCart } from "@/hooks/useCart";
-
-const SHIPPING_COST = 10000;
-const DISCOUNT = 5000;
+import { useMyTransactions, usePaymentMethods } from "@/hooks/useTransactions";
+import { authStorage } from "@/lib/authStorage";
+import { formatPrice } from "@/lib/format";
 
 export default function CartPage() {
+  const navigate = useNavigate();
   const cart = useCart();
+  const payment = usePaymentMethods();
+  // enabled: false → halaman ini cukup memakai checkout(), tanpa memuat daftar.
+  const { checkout, submitting, actionError } = useMyTransactions({
+    enabled: false,
+  });
   const user = authStorage.getUser();
+  const [paymentMethodId, setPaymentMethodId] = useState("");
 
   const subtotal = cart.carts.reduce((total, item) => {
     const food = item.food ?? item;
     return total + Number(food.price || 0) * Number(item.quantity || 0);
   }, 0);
 
-  const shippingCost = cart.carts.length > 0 ? SHIPPING_COST : 0;
-  const discount = cart.carts.length > 0 ? DISCOUNT : 0;
-  const total = subtotal + shippingCost - discount;
+  const handleCheckout = async () => {
+    const result = await checkout({
+      cartIds: cart.carts.map((item) => item.id),
+      paymentMethodId,
+    });
+    if (!result.ok) return;
+
+    // Server sudah menghapus item yang di-checkout dari keranjang.
+    // Ambil ulang supaya badge di Navbar ikut menjadi 0.
+    await cart.refetch();
+    navigate(
+      result.transactionId
+        ? ROUTES.TRANSACTION_DETAIL(result.transactionId)
+        : ROUTES.TRANSACTIONS,
+    );
+  };
 
   if (cart.loading)
     return (
@@ -28,6 +48,31 @@ export default function CartPage() {
         Memuat keranjang...
       </section>
     );
+
+  if (cart.carts.length === 0)
+    return (
+      <section className="mx-auto max-w-[1110px] px-5 py-14 text-center">
+        <h1 className="text-2xl font-extrabold">Keranjang masih kosong</h1>
+        <p className="mt-2 text-base text-slate-500">
+          Yuk pilih menu favoritmu dulu.
+        </p>
+        <div className="mt-6 flex justify-center gap-3">
+          <Link
+            to={ROUTES.FOODS}
+            className="rounded-lg bg-accent px-5 py-3 text-base font-bold text-white"
+          >
+            Jelajahi Makanan
+          </Link>
+          <Link
+            to={ROUTES.TRANSACTIONS}
+            className="rounded-lg border border-slate-200 px-5 py-3 text-base font-bold text-navy"
+          >
+            Lihat Pesanan Saya
+          </Link>
+        </div>
+      </section>
+    );
+
   return (
     <section className="mx-auto max-w-[1110px] px-5 py-8">
       <div className="mb-7">
@@ -113,21 +158,52 @@ export default function CartPage() {
             })}
           </div>
 
-          {/* Payment Method */}
+          {/* Payment Method: dari GET /payment-methods */}
           <div className="rounded-xl border border-slate-200 bg-white p-5">
             <h2 className="border-b border-slate-200 pb-4 text-base font-extrabold">
               Metode Pembayaran
             </h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <button className="rounded-lg border-2 border-primary p-3 text-left text-base font-bold text-navy">
-                ◉　Transfer Bank BCA
-              </button>
-              <button className="rounded-lg border border-slate-200 p-3 text-left text-base font-bold text-slate-600">
-                ○　GoPay / ShopeePay
-              </button>
-              <button className="rounded-lg border border-slate-200 p-3 text-left text-base font-bold text-slate-600">
-                ○　OVO / DANA
-              </button>
+
+            {payment.loading && (
+              <p className="mt-4 text-base text-slate-500">
+                Memuat metode pembayaran...
+              </p>
+            )}
+            {payment.error && (
+              <p className="mt-4 rounded-lg bg-red-50 p-3 text-base text-red-700">
+                Gagal memuat metode pembayaran: {getErrorMessage(payment.error)}
+              </p>
+            )}
+
+            <div
+              role="radiogroup"
+              aria-label="Metode pembayaran"
+              className="mt-4 grid gap-3 sm:grid-cols-2"
+            >
+              {payment.methods.map((method) => {
+                const active = method.id === paymentMethodId;
+                return (
+                  <button
+                    key={method.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => setPaymentMethodId(method.id)}
+                    className={`flex items-center gap-3 rounded-lg p-3 text-left text-base font-bold ${
+                      active
+                        ? "border-2 border-primary text-navy"
+                        : "border border-slate-200 text-slate-600"
+                    }`}
+                  >
+                    <img
+                      src={method.imageUrl}
+                      alt=""
+                      className="h-6 w-12 object-contain"
+                    />
+                    Transfer {method.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -142,25 +218,25 @@ export default function CartPage() {
               <span>Total Harga ({cart.totalQuantity} Barang)</span>
               <span>{formatPrice(subtotal)}</span>
             </div>
-            <div className="flex justify-between text-slate-500">
-              <span>Ongkos Kirim</span>
-              <span>{formatPrice(shippingCost)}</span>
-            </div>
-            <div className="flex justify-between text-emerald-500">
-              <span>Diskon Promo</span>
-              <span>-{formatPrice(discount)}</span>
-            </div>
           </div>
           <div className="flex justify-between border-t border-slate-200 pt-4 font-extrabold">
             <span>Total Pembayaran</span>
-            <span className="text-primary">{formatPrice(total)}</span>
+            <span className="text-primary">{formatPrice(subtotal)}</span>
           </div>
-          <Link
-            to={ROUTES.TRANSACTIONS}
-            className="mt-5 block rounded-lg bg-accent py-3 text-center text-base font-bold text-white"
+          <button
+            type="button"
+            onClick={handleCheckout}
+            disabled={submitting}
+            className="mt-5 w-full rounded-lg bg-accent py-3 text-base font-bold text-white disabled:opacity-50"
           >
-            Buat Transaksi
-          </Link>
+            {submitting ? "Membuat transaksi..." : "Buat Transaksi"}
+          </button>
+
+          {actionError && (
+            <p className="mt-3 rounded-lg bg-red-50 p-3 text-base text-red-700">
+              {actionError}
+            </p>
+          )}
         </aside>
       </div>
     </section>
