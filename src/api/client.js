@@ -28,7 +28,8 @@ apiClient.interceptors.response.use(
 //   { errors: [{ field, message }, ...] }             -> error validasi (mis. register)
 export function getErrorMessage(error) {
   const data = error.response?.data;
-  if (data?.errors?.length)
+  if (typeof data?.errors === "string") return data.errors;
+  if (Array.isArray(data?.errors) && data.errors.length)
     return data.errors.map((item) => item.message).join(" ");
   return data?.message || error.message || "Request failed.";
 }
