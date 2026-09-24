@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 
 import { getErrorMessage } from "@/api/client";
-import TransactionStatusBadge from "@/components/TransactionStatusbadge";
+import TransactionStatusBadge from "@/components/TransactionStatusBadge";
 import { ROUTES } from "@/constants";
 import { useMyTransactions } from "@/hooks/useTransactions";
 import { formatDateTime, formatPrice } from "@/lib/format";

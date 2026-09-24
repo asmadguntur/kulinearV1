@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router";
 
 import { getErrorMessage } from "@/api/client";
 import ProofPaymentForm from "@/components/ProofPaymentForm";
-import TransactionStatusBadge from "@/components/TransactionStatusbadge";
+import TransactionStatusBadge from "@/components/TransactionStatusBadge";
 import { ROUTES } from "@/constants";
 import { FALLBACK_FOOD_IMAGE } from "@/data/demoFoods";
 import { useMyTransactions } from "@/hooks/useTransactions";

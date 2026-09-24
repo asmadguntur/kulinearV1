@@ -1,12 +1,6 @@
 import apiClient from "@/api/client";
 import { ENDPOINTS } from "@/api/endpoints";
 
-// Daftar bank: [{ id, name, imageUrl }]. Bisa diakses tanpa token.
-export async function getPaymentMethods() {
-  const response = await apiClient.get(ENDPOINTS.PAYMENTS.GET_METHODS);
-  return response.data.data;
-}
-
 // Balasan sukses hanya { message: "Transaction Created" }, TANPA id transaksi.
 // Item keranjang yang ikut di-checkout otomatis dihapus server.
 export async function createTransaction({ cartIds, paymentMethodId }) {
