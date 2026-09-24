@@ -5,8 +5,6 @@ import {
   cancelTransaction,
   createTransaction,
   getMyTransactions,
-  getPaymentMethods,
-  updateProofPayment,
 } from "@/api/transactions";
 import { uploadImage } from "@/api/upload";
 import { sortNewest } from "@/lib/transaction";
@@ -20,12 +18,6 @@ const initialState = {
   submitting: false, // checkout sedang berjalan
   pendingIds: [], // id transaksi yang sedang dibatalkan / dikirimi bukti
   actionError: "",
-
-  // --- daftar bank (GET /payment-methods) ---
-  paymentMethods: [],
-  paymentLoading: false,
-  paymentError: null,
-  paymentLoaded: false,
 };
 
 export const useTransactionStore = create((set, get) => {
@@ -113,7 +105,7 @@ export const useTransactionStore = create((set, get) => {
     uploadProof: (id, file) =>
       runForTransaction(id, async () => {
         const url = await uploadImage(file);
-        await updateProofPayment(id, url);
+        // await updateProofPayment(id, url);
       }),
 
     saveProofUrl: (id, url) => {
@@ -122,31 +114,7 @@ export const useTransactionStore = create((set, get) => {
         set({ actionError: "Link harus diawali http:// atau https://" });
         return Promise.resolve(false);
       }
-      return runForTransaction(id, () => updateProofPayment(id, cleanUrl));
-    },
-
-    fetchPaymentMethods: async () => {
-      set({ paymentLoading: true, paymentError: null });
-      try {
-        const data = await getPaymentMethods();
-        set({
-          paymentMethods: Array.isArray(data) ? data : [],
-          paymentLoading: false,
-          paymentLoaded: true,
-        });
-      } catch (error) {
-        set({
-          paymentLoading: false,
-          paymentError: error,
-          paymentLoaded: true,
-        });
-      }
-    },
-
-    ensurePaymentMethods: () => {
-      const { paymentLoaded, paymentLoading, fetchPaymentMethods } = get();
-      if (paymentLoaded || paymentLoading) return;
-      fetchPaymentMethods();
+      return runForTransaction(id);
     },
 
     clearActionError: () => set({ actionError: "" }),
