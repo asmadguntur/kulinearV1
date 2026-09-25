@@ -8,6 +8,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useRatingStore } from "@/store/ratingStore";
 import { useAdminTransactionStore } from "@/store/adminTransactionStore";
 import { useTransactionStore } from "@/store/transactionStore";
+import { usePaymentMethodStore } from "@/store/paymentMethodStore";
 
 export default function AuthPage({ mode }) {
   const isLogin = mode === "login";
@@ -50,6 +51,7 @@ export default function AuthPage({ mode }) {
         useRatingStore.getState().reset(); // reset rating store saat login/logout
         useTransactionStore.getState().reset(); // reset transaction store saat login/logout
         useAdminTransactionStore.getState().reset(); // reset admin transaction store saat login/logout
+        usePaymentMethodStore.getState().reset();
         // Jika user login dari halaman register, redirect ke halaman asal.
         // Jika user login dari halaman lain, redirect ke home page sesuai role.
         const isAdmin = response.user?.role === ROLES.ADMIN;

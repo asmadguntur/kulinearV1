@@ -7,6 +7,7 @@ import AdminFoodsPage from "@/pages/AdminFoodsPage";
 import AdminFoodFormPage from "@/pages/AdminFoodFormPage";
 import AdminTransactionsPage from "@/pages/AdminTransactionsPage";
 import AdminUsersPage from "@/pages/AdminUsersPage";
+import AdminPaymentMethodsPage from "./pages/AdminPaymentMethodsPage";
 import AuthLayout from "@/layouts/AuthLayout";
 import AuthPage from "@/pages/AuthPage";
 import CartPage from "@/pages/CartPage";
@@ -88,6 +89,10 @@ export default function App() {
                 <Route
                   path="transactions"
                   element={<AdminTransactionsPage />}
+                />
+                <Route
+                  path="payment-methods"
+                  element={<AdminPaymentMethodsPage />}
                 />
               </Route>
             </Route>

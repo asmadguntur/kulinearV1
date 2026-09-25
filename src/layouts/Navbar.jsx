@@ -7,6 +7,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useRatingStore } from "@/store/ratingStore";
 import { useAdminTransactionStore } from "@/store/adminTransactionStore";
 import { useTransactionStore } from "@/store/transactionStore";
+import { usePaymentMethodStore } from "@/store/paymentMethodStore";
 
 const navItems = [["Jelajahi Makanan", ROUTES.FOODS]];
 
@@ -32,6 +33,7 @@ export default function Navbar() {
     useRatingStore.getState().reset();
     useTransactionStore.getState().reset();
     useAdminTransactionStore.getState().reset();
+    usePaymentMethodStore.getState().reset();
     navigate(ROUTES.LANDING);
   };
 

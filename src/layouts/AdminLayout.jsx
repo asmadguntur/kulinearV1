@@ -7,6 +7,7 @@ const adminNavItems = [
   ["Foods", ROUTES.ADMIN_FOODS],
   ["Users", ROUTES.ADMIN_USERS],
   ["Transactions", ROUTES.ADMIN_TRANSACTIONS],
+  ["Payment Methods", ROUTES.ADMIN_PAYMENT_METHODS],
 ];
 
 export default function AdminLayout() {

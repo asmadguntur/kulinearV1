@@ -19,5 +19,6 @@ export const ROUTES = {
   ADMIN_EDIT_FOOD: (foodId) => `/admin/foods/${foodId}/edit`,
   ADMIN_USERS: "/admin/users",
   ADMIN_TRANSACTIONS: "/admin/transactions",
+  ADMIN_PAYMENT_METHODS: "/admin/payment-methods",
   UNAUTHORIZED: "/unauthorized",
 };
