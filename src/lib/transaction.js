@@ -8,12 +8,16 @@ export const TRANSACTION_STATUS = {
   CANCELLED: "cancelled",
 };
 
-// Label & warna untuk tiap status. "expired" bukan status dari API,
-// tapi hasil hitungan isExpired() di bawah.
+// Label & warna untuk tiap status. "review" dan "expired" bukan status dari
+// API, tapi hasil hitungan getStatusKey() di bawah.
 export const STATUS_LABELS = {
   pending: {
     label: "Menunggu Bayar",
     className: "bg-amber-50 text-amber-700",
+  },
+  review: {
+    label: "Menunggu Verifikasi",
+    className: "bg-blue-50 text-primary",
   },
   expired: { label: "Kedaluwarsa", className: "bg-slate-100 text-slate-500" },
   success: { label: "Berhasil", className: "bg-emerald-50 text-emerald-700" },
@@ -43,8 +47,13 @@ export function isPending(transaction) {
   return transaction?.status === TRANSACTION_STATUS.PENDING;
 }
 
-// Kunci label yang dipakai badge: status asli, atau "expired".
+// Kunci label yang dipakai badge: status asli, "review", atau "expired".
+// "review": masih pending tapi bukti sudah dikirim, jadi tinggal menunggu
+// admin mengubah status (user tidak bisa mengubahnya sendiri, API menolak).
+// Dicek sebelum "expired": bukti yang terkirim sebelum batas waktu tetap
+// menunggu verifikasi walaupun batas waktunya sudah lewat.
 export function getStatusKey(transaction) {
+  if (isPending(transaction) && transaction.proofPaymentUrl) return "review";
   return isExpired(transaction) ? "expired" : transaction?.status;
 }
 

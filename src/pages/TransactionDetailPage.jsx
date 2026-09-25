@@ -16,8 +16,8 @@ import {
 } from "@/lib/transaction";
 
 // ---------------------------------------------------------------------------
-// Teks & ikon hero per status. "review" bukan status dari API: artinya
-// masih pending tapi user sudah mengirim bukti.
+// Teks & ikon hero per status. Kuncinya sama dengan getStatusKey():
+// "review" = masih pending tapi user sudah mengirim bukti.
 // ---------------------------------------------------------------------------
 const HERO = {
   pending: {
@@ -57,12 +57,6 @@ const HERO = {
     text: "Pesanan ini sudah dibatalkan dan tidak akan diproses.",
   },
 };
-
-function getHeroKey(transaction) {
-  const key = getStatusKey(transaction); // pending | expired | success | ...
-  if (key === "pending" && transaction.proofPaymentUrl) return "review";
-  return key;
-}
 
 const PAYMENT_STEPS = [
   "Buka aplikasi m-banking atau internet banking Anda.",
@@ -201,7 +195,7 @@ export default function TransactionDetailPage() {
   // saveProofUrl/uploadProof berhasil dan store mengambil ulang data.
   const needsProof = canPay && !transaction.proofPaymentUrl;
   const busy = isBusy(transaction.id);
-  const hero = HERO[getHeroKey(transaction)] || HERO.pending;
+  const hero = HERO[getStatusKey(transaction)] || HERO.pending;
 
   const handleCopy = async () => {
     try {
