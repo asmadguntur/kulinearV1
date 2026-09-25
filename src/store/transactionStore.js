@@ -5,6 +5,7 @@ import {
   cancelTransaction,
   createTransaction,
   getMyTransactions,
+  updateProofPayment,
 } from "@/api/transactions";
 import { uploadImage } from "@/api/upload";
 import { sortNewest } from "@/lib/transaction";
@@ -102,19 +103,21 @@ export const useTransactionStore = create((set, get) => {
 
     cancel: (id) => runForTransaction(id, () => cancelTransaction(id)),
 
+    // Cara 1: upload file dulu, lalu URL hasil upload disimpan sebagai bukti.
     uploadProof: (id, file) =>
       runForTransaction(id, async () => {
         const url = await uploadImage(file);
-        // await updateProofPayment(id, url);
+        await updateProofPayment(id, url);
       }),
 
+    // Cara 2: user menempelkan link gambar yang sudah ada.
     saveProofUrl: (id, url) => {
       const cleanUrl = url.trim();
       if (!/^https?:\/\//.test(cleanUrl)) {
         set({ actionError: "Link harus diawali http:// atau https://" });
         return Promise.resolve(false);
       }
-      return runForTransaction(id);
+      return runForTransaction(id, () => updateProofPayment(id, cleanUrl));
     },
 
     clearActionError: () => set({ actionError: "" }),

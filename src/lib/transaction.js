@@ -12,7 +12,7 @@ export const TRANSACTION_STATUS = {
 // tapi hasil hitungan isExpired() di bawah.
 export const STATUS_LABELS = {
   pending: {
-    label: "Menunggu Pembayaran",
+    label: "Menunggu Bayar",
     className: "bg-amber-50 text-amber-700",
   },
   expired: { label: "Kedaluwarsa", className: "bg-slate-100 text-slate-500" },

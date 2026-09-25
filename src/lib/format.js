@@ -10,3 +10,16 @@ export function formatDateTime(value) {
     timeStyle: "short",
   }).format(new Date(value));
 }
+
+// "2026-09-25T12:35:00.000Z" -> "25 Sep 2026, 19.35 WIB"
+// timeZone dikunci ke Asia/Jakarta, jadi hasilnya selalu WIB walaupun
+// laptop penggunanya diatur ke zona waktu lain.
+export function formatDateTimeWIB(value) {
+  if (!value) return "-";
+  const text = new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(value));
+  return `${text} WIB`;
+}
