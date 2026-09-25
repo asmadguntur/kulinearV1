@@ -18,8 +18,6 @@ export default function CartPage() {
     enabled: false,
   });
   const user = authStorage.getUser();
-  const [paymentMethodId, setPaymentMethodId] = useState("");
-
   const subtotal = cart.carts.reduce((total, item) => {
     const food = item.food ?? item;
     return total + Number(food.price || 0) * Number(item.quantity || 0);
@@ -28,9 +26,11 @@ export default function CartPage() {
   const handleCheckout = async () => {
     const result = await checkout({
       cartIds: cart.carts.map((item) => item.id),
-      paymentMethodId,
+      paymentMethodId: payment.selectedId,
     });
     if (!result.ok) return;
+
+    payment.clearSelection();
 
     // Server sudah menghapus item yang di-checkout dari keranjang.
     // Ambil ulang supaya badge di Navbar ikut menjadi 0.
@@ -158,53 +158,19 @@ export default function CartPage() {
             })}
           </div>
 
-          {/* Payment Method: dari GET /payment-methods */}
+          {/* Payment Method: dari paymentMethodStore */}
           <div className="rounded-xl border border-slate-200 bg-white p-5">
             <h2 className="border-b border-slate-200 pb-4 text-base font-extrabold">
               Metode Pembayaran
             </h2>
-
-            {payment.loading && (
-              <p className="mt-4 text-base text-slate-500">
-                Memuat metode pembayaran...
-              </p>
-            )}
-            {payment.error && (
-              <p className="mt-4 rounded-lg bg-red-50 p-3 text-base text-red-700">
-                Gagal memuat metode pembayaran: {getErrorMessage(payment.error)}
-              </p>
-            )}
-
-            <div
-              role="radiogroup"
-              aria-label="Metode pembayaran"
-              className="mt-4 grid gap-3 sm:grid-cols-2"
-            >
-              {payment.methods.map((method) => {
-                const active = method.id === paymentMethodId;
-                return (
-                  <button
-                    key={method.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    onClick={() => setPaymentMethodId(method.id)}
-                    className={`flex items-center gap-3 rounded-lg p-3 text-left text-base font-bold ${
-                      active
-                        ? "border-2 border-primary text-navy"
-                        : "border border-slate-200 text-slate-600"
-                    }`}
-                  >
-                    <img
-                      src={method.imageUrl}
-                      alt=""
-                      className="h-6 w-12 object-contain"
-                    />
-                    Transfer {method.name}
-                  </button>
-                );
-              })}
-            </div>
+            <PaymentMethodPicker
+              methods={payment.methods}
+              selectedId={payment.selectedId}
+              onSelect={payment.select}
+              loading={payment.loading}
+              error={payment.error}
+              onRetry={payment.refetch}
+            />
           </div>
         </div>
 
@@ -217,6 +183,12 @@ export default function CartPage() {
             <div className="flex justify-between text-slate-500">
               <span>Total Harga ({cart.totalQuantity} Barang)</span>
               <span>{formatPrice(subtotal)}</span>
+            </div>
+            <div className="flex justify-between text-slate-500">
+              <span>Metode Pembayaran</span>
+              <span className="font-bold text-navy">
+                {payment.selectedMethod?.name || "Belum dipilih"}
+              </span>
             </div>
           </div>
           <div className="flex justify-between border-t border-slate-200 pt-4 font-extrabold">
