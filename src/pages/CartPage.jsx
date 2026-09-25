@@ -1,11 +1,11 @@
-import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
-import { getErrorMessage } from "@/api/client";
+import PaymentMethodPicker from "@/components/PaymentMethodPicker";
 import { ROUTES } from "@/constants";
 import { FALLBACK_FOOD_IMAGE } from "@/data/demoFoods";
 import { useCart } from "@/hooks/useCart";
-import { useMyTransactions, usePaymentMethods } from "@/hooks/useTransactions";
+import { usePaymentMethods } from "@/hooks/usePaymentMethods";
+import { useMyTransactions } from "@/hooks/useTransactions";
 import { authStorage } from "@/lib/authStorage";
 import { formatPrice } from "@/lib/format";
 
